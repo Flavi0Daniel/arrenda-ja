@@ -1,12 +1,8 @@
 const jwt = require('jsonwebtoken');
 const UtilizadorRepositorio = require('../repositorios/UtilizadorRepositorio');
 
-/**
- * Middleware para verificar se o utilizador está autenticado
- */
 async function verificarAutenticacao(req, res, next) {
     try {
-        // Obter token do cabeçalho
         const autorizacao = req.headers.authorization;
         
         if (!autorizacao || !autorizacao.startsWith('Bearer ')) {
@@ -16,12 +12,11 @@ async function verificarAutenticacao(req, res, next) {
             });
         }
 
-        const token = autorizacao.substring(7); // Remover "Bearer "
+        const token = autorizacao.substring(7);
 
-        // Verificar token
-        const decoded = jwt.verify(token, process.env.JWT_SEGREDO);
+        // IMPORTANTE: Use JWT_SECRET
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Buscar utilizador
         const utilizador = await UtilizadorRepositorio.buscarPorId(decoded.utilizadorId);
         
         if (!utilizador) {
@@ -31,7 +26,6 @@ async function verificarAutenticacao(req, res, next) {
             });
         }
 
-        // Adicionar utilizador ao request
         req.utilizador = utilizador;
         next();
     } catch (erro) {
@@ -42,9 +36,6 @@ async function verificarAutenticacao(req, res, next) {
     }
 }
 
-/**
- * Middleware para verificar se o utilizador é proprietário
- */
 function verificarProprietario(req, res, next) {
     if (!req.utilizador || !req.utilizador.eProprietario()) {
         return res.status(403).json({
@@ -55,9 +46,6 @@ function verificarProprietario(req, res, next) {
     next();
 }
 
-/**
- * Middleware para verificar se o utilizador é arrendatário
- */
 function verificarArrendatario(req, res, next) {
     if (!req.utilizador || !req.utilizador.eArrendatario()) {
         return res.status(403).json({
@@ -68,9 +56,6 @@ function verificarArrendatario(req, res, next) {
     next();
 }
 
-/**
- * Middleware para verificar se o utilizador é administrador
- */
 function verificarAdministrador(req, res, next) {
     if (!req.utilizador || !req.utilizador.eAdministrador()) {
         return res.status(403).json({
@@ -81,16 +66,13 @@ function verificarAdministrador(req, res, next) {
     next();
 }
 
-/**
- * Middleware opcional de autenticação (não retorna erro se não houver token)
- */
 async function autenticacaoOpcional(req, res, next) {
     try {
         const autorizacao = req.headers.authorization;
         
         if (autorizacao && autorizacao.startsWith('Bearer ')) {
             const token = autorizacao.substring(7);
-            const decoded = jwt.verify(token, process.env.JWT_SEGREDO);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const utilizador = await UtilizadorRepositorio.buscarPorId(decoded.utilizadorId);
             
             if (utilizador) {
