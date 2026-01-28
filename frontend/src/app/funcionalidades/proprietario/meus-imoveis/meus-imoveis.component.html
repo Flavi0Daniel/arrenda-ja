@@ -1,0 +1,165 @@
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold">
+        <i class="bi bi-building me-2"></i>
+        Meus Imóveis
+      </h2>
+      <p class="text-muted mb-0">Gerencie seus imóveis publicados</p>
+    </div>
+    <a routerLink="/proprietario/criar-imovel" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-2"></i>
+      Publicar Novo Imóvel
+    </a>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-3">
+          <label class="form-label small text-muted mb-1">Filtrar por status:</label>
+          <select 
+            class="form-select" 
+            [(ngModel)]="filtroStatus"
+            (change)="aplicarFiltro()">
+            <option value="todos">Todos ({{ imoveis.length }})</option>
+            <option value="disponivel">Disponíveis</option>
+            <option value="arrendado">Arrendados</option>
+            <option value="em_analise">Em Análise</option>
+            <option value="inativo">Inativos</option>
+          </select>
+        </div>
+        <div class="col-md-9 text-end">
+          <span class="text-muted small">
+            Mostrando {{ imoveisFiltrados.length }} de {{ imoveis.length }} imóveis
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <app-carregamento 
+    *ngIf="carregando" 
+    mensagem="A carregar seus imóveis...">
+  </app-carregamento>
+
+  <!-- Erro -->
+  <div class="alert alert-danger" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+  </div>
+
+  <!-- Lista de Imóveis -->
+  <div *ngIf="!carregando && !erro">
+    <!-- Nenhum imóvel -->
+    <div class="text-center py-5" *ngIf="imoveis.length === 0">
+      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhum imóvel publicado ainda</h4>
+      <p class="text-muted">Comece publicando seu primeiro imóvel</p>
+      <a routerLink="/proprietario/criar-imovel" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>
+        Publicar Primeiro Imóvel
+      </a>
+    </div>
+
+    <!-- Cards de Imóveis -->
+    <div class="row g-4" *ngIf="imoveisFiltrados.length > 0">
+      <div class="col-md-6 col-lg-4" *ngFor="let imovel of imoveisFiltrados">
+        <div class="card h-100 shadow-sm">
+          <!-- Imagem -->
+          <div class="position-relative">
+            <img 
+              [src]="obterUrlFoto(imovel.fotoPrincipal || '')" 
+              [alt]="imovel.titulo"
+              class="card-img-top"
+              style="height: 200px; object-fit: cover;">
+            
+            <!-- Badge de Status -->
+            <span class="position-absolute top-0 end-0 m-2 badge"
+                  [class]="'bg-' + obterCorStatus(imovel.status)">
+              {{ obterTextoStatus(imovel.status) }}
+            </span>
+
+            <!-- Tipologia -->
+            <span class="position-absolute bottom-0 start-0 m-2 badge bg-dark">
+              {{ imovel.tipologia }}
+            </span>
+          </div>
+
+          <!-- Conteúdo -->
+          <div class="card-body">
+            <h5 class="card-title text-truncate" [title]="imovel.titulo">
+              {{ imovel.titulo }}
+            </h5>
+
+            <p class="card-text small text-muted mb-2" *ngIf="imovel.condominio">
+              <i class="bi bi-geo-alt me-1"></i>
+              {{ imovel.condominio.bairro }}, {{ imovel.condominio.municipio }}
+            </p>
+
+            <!-- Características -->
+            <div class="d-flex gap-2 mb-3 small text-muted">
+              <span *ngIf="imovel.numeroQuartos">
+                <i class="bi bi-door-closed me-1"></i>
+                {{ imovel.numeroQuartos }}
+              </span>
+              <span *ngIf="imovel.numeroCasasBanho">
+                <i class="bi bi-droplet me-1"></i>
+                {{ imovel.numeroCasasBanho }}
+              </span>
+              <span *ngIf="imovel.areaMetrosQuadrados">
+                <i class="bi bi-arrows-fullscreen me-1"></i>
+                {{ imovel.areaMetrosQuadrados }}m²
+              </span>
+            </div>
+
+            <!-- Preço -->
+            <h4 class="text-primary mb-3">
+              {{ formatarPreco(imovel.precoMensal) }}
+              <small class="text-muted fs-6">/mês</small>
+            </h4>
+
+            <!-- Ações -->
+            <div class="d-grid gap-2">
+              <button 
+                class="btn btn-outline-primary btn-sm"
+                (click)="verDetalhes(imovel.id)">
+                <i class="bi bi-eye me-1"></i>
+                Ver Detalhes
+              </button>
+              
+              <div class="btn-group">
+                <button 
+                  class="btn btn-outline-secondary btn-sm"
+                  (click)="editarImovel(imovel.id)"
+                  *ngIf="imovel.status !== 'arrendado'">
+                  <i class="bi bi-pencil me-1"></i>
+                  Editar
+                </button>
+                <button 
+                  class="btn btn-outline-success btn-sm"
+                  (click)="marcarComoArrendado(imovel.id)"
+                  *ngIf="imovel.status === 'disponivel'">
+                  <i class="bi bi-check-circle me-1"></i>
+                  Marcar Arrendado
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nenhum resultado no filtro -->
+    <div class="text-center py-5" *ngIf="imoveisFiltrados.length === 0 && imoveis.length > 0">
+      <i class="bi bi-search fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhum imóvel com este status</h4>
+      <button class="btn btn-outline-primary" (click)="filtroStatus = 'todos'; aplicarFiltro()">
+        Mostrar Todos
+      </button>
+    </div>
+  </div>
+</div>

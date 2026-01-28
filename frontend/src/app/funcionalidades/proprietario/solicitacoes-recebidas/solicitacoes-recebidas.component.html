@@ -1,0 +1,260 @@
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-inbox me-2"></i>
+      Solicitações Recebidas
+    </h2>
+    <p class="text-muted mb-0">Gerencie as solicitações de arrendamento dos seus imóveis</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="btn-group" role="group">
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="pendente" 
+          value="pendente"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()"
+          checked>
+        <label class="btn btn-outline-warning" for="pendente">
+          <i class="bi bi-clock me-1"></i>
+          Pendentes
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="aceite" 
+          value="aceite"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-success" for="aceite">
+          <i class="bi bi-check-circle me-1"></i>
+          Aceites
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="recusada" 
+          value="recusada"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-danger" for="recusada">
+          <i class="bi bi-x-circle me-1"></i>
+          Recusadas
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="todas" 
+          value="todas"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-primary" for="todas">
+          <i class="bi bi-list me-1"></i>
+          Todas
+        </label>
+      </div>
+
+      <span class="ms-3 text-muted small">
+        Mostrando {{ solicitacoesFiltradas.length }} de {{ solicitacoes.length }} solicitações
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <app-carregamento 
+    *ngIf="carregando" 
+    mensagem="A carregar solicitações...">
+  </app-carregamento>
+
+  <!-- Erro -->
+  <div class="alert alert-danger" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+  </div>
+
+  <!-- Lista de Solicitações -->
+  <div *ngIf="!carregando && !erro">
+    <!-- Nenhuma solicitação -->
+    <div class="text-center py-5" *ngIf="solicitacoes.length === 0">
+      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhuma solicitação recebida ainda</h4>
+      <p class="text-muted">Quando alguém se interessar pelos seus imóveis, as solicitações aparecerão aqui</p>
+    </div>
+
+    <!-- Cards de Solicitações -->
+    <div class="row g-4" *ngIf="solicitacoesFiltradas.length > 0">
+      <div class="col-12" *ngFor="let solicitacao of solicitacoesFiltradas">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <!-- Avatar -->
+              <div class="col-auto">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                     style="width: 60px; height: 60px;">
+                  <i class="bi bi-person fs-3"></i>
+                </div>
+              </div>
+
+              <!-- Informações -->
+              <div class="col">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h5 class="mb-1">{{ solicitacao.arrendatarioNome }}</h5>
+                    <p class="text-muted small mb-1">
+                      <i class="bi bi-envelope me-1"></i>
+                      {{ solicitacao.arrendatarioEmail }}
+                    </p>
+                    <p class="text-muted small mb-0" *ngIf="solicitacao.arrendatarioTelefone">
+                      <i class="bi bi-telephone me-1"></i>
+                      {{ solicitacao.arrendatarioTelefone }}
+                    </p>
+                  </div>
+                  <span class="badge" [class]="'bg-' + obterCorStatus(solicitacao.status)">
+                    {{ obterTextoStatus(solicitacao.status) }}
+                  </span>
+                </div>
+
+                <div class="alert alert-light mb-2">
+                  <strong class="d-block mb-1">
+                    <i class="bi bi-building me-1"></i>
+                    {{ solicitacao.imovelTitulo }}
+                  </strong>
+                  <span class="text-primary">
+                    {{ formatarPreco(solicitacao.imovelPreco || 0) }}/mês
+                  </span>
+                </div>
+
+                <div class="mb-2" *ngIf="solicitacao.mensagemInicial">
+                  <strong class="small">Mensagem:</strong>
+                  <p class="mb-0 text-muted small">{{ solicitacao.mensagemInicial }}</p>
+                </div>
+
+                <div class="mb-2" *ngIf="solicitacao.observacoes">
+                  <strong class="small">Sua Resposta:</strong>
+                  <p class="mb-0 text-muted small">{{ solicitacao.observacoes }}</p>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>
+                    Recebida em {{ solicitacao.dataSolicitacao | date:'dd/MM/yyyy HH:mm' }}
+                  </small>
+
+                  <div class="btn-group" *ngIf="solicitacao.status === 'pendente'">
+                    <button 
+                      class="btn btn-success btn-sm"
+                      (click)="abrirModal(solicitacao, true)">
+                      <i class="bi bi-check-circle me-1"></i>
+                      Aceitar
+                    </button>
+                    <button 
+                      class="btn btn-danger btn-sm"
+                      (click)="abrirModal(solicitacao, false)">
+                      <i class="bi bi-x-circle me-1"></i>
+                      Recusar
+                    </button>
+                  </div>
+
+                  <span class="text-muted small" *ngIf="solicitacao.status !== 'pendente' && solicitacao.dataResposta">
+                    Respondida em {{ solicitacao.dataResposta | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nenhum resultado no filtro -->
+    <div class="text-center py-5" *ngIf="solicitacoesFiltradas.length === 0 && solicitacoes.length > 0">
+      <i class="bi bi-search fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhuma solicitação com este status</h4>
+      <button class="btn btn-outline-primary" (click)="filtroStatus = 'todas'; aplicarFiltro()">
+        Mostrar Todas
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Resposta -->
+<div class="modal fade show d-block" *ngIf="mostrarModal" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Responder Solicitação
+        </h5>
+        <button type="button" class="btn-close" (click)="fecharModal()"></button>
+      </div>
+      <div class="modal-body" *ngIf="solicitacaoSelecionada">
+        <div class="alert alert-info">
+          <strong>{{ solicitacaoSelecionada.arrendatarioNome }}</strong> está interessado em:
+          <br>
+          <strong>{{ solicitacaoSelecionada.imovelTitulo }}</strong>
+        </div>
+
+        <div class="mb-3">
+          <label for="observacoes" class="form-label">
+            Mensagem para o arrendatário (Opcional)
+          </label>
+          <textarea 
+            class="form-control" 
+            id="observacoes" 
+            rows="4"
+            [(ngModel)]="observacoes"
+            placeholder="Adicione informações adicionais, condições, horários para visita, etc."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="fecharModal()"
+          [disabled]="enviandoResposta">
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-danger"
+          (click)="responderSolicitacao(false)"
+          [disabled]="enviandoResposta">
+          <span *ngIf="!enviandoResposta">
+            <i class="bi bi-x-circle me-2"></i>
+            Recusar
+          </span>
+          <span *ngIf="enviandoResposta">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            A enviar...
+          </span>
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-success"
+          (click)="responderSolicitacao(true)"
+          [disabled]="enviandoResposta">
+          <span *ngIf="!enviandoResposta">
+            <i class="bi bi-check-circle me-2"></i>
+            Aceitar
+          </span>
+          <span *ngIf="enviandoResposta">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            A enviar...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

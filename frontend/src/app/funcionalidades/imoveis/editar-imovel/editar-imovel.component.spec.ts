@@ -1,0 +1,21 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { EditarImovelComponent } from './editar-imovel.component';
+
+describe('EditarImovelComponent', () => {
+  let component: EditarImovelComponent;
+  let fixture: ComponentFixture<EditarImovelComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [EditarImovelComponent]
+    });
+    fixture = TestBed.createComponent(EditarImovelComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

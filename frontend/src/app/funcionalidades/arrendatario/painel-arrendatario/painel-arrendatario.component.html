@@ -1,0 +1,183 @@
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-speedometer2 me-2"></i>
+      Painel do Arrendatário
+    </h2>
+    <p class="text-muted">Bem-vindo de volta, {{ nomeUtilizador }}!</p>
+  </div>
+
+  <!-- Loading -->
+  <app-carregamento *ngIf="carregando" mensagem="A carregar dados..."></app-carregamento>
+
+  <!-- Dashboard -->
+  <div *ngIf="!carregando">
+    <!-- Cards de Estatísticas -->
+    <div class="row g-4 mb-4">
+      <!-- Total de Solicitações -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Total de Solicitações</p>
+                <h3 class="mb-0 fw-bold">{{ totalSolicitacoes }}</h3>
+              </div>
+              <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-send fs-3 text-primary"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pendentes -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Pendentes</p>
+                <h3 class="mb-0 fw-bold text-warning">{{ solicitacoesPendentes }}</h3>
+              </div>
+              <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-clock fs-3 text-warning"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aceites -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Aceites</p>
+                <h3 class="mb-0 fw-bold text-success">{{ solicitacoesAceites }}</h3>
+              </div>
+              <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-check-circle fs-3 text-success"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recusadas -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Recusadas</p>
+                <h3 class="mb-0 fw-bold text-danger">{{ solicitacoesRecusadas }}</h3>
+              </div>
+              <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-x-circle fs-3 text-danger"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-lightning-charge me-2"></i>
+              Ações Rápidas
+            </h5>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-primary" (click)="pesquisarImoveis()">
+                <i class="bi bi-search me-2"></i>
+                Pesquisar Imóveis
+              </button>
+              <a routerLink="/arrendatario/solicitacoes" class="btn btn-outline-primary">
+                <i class="bi bi-inbox me-2"></i>
+                Minhas Solicitações
+                <span class="badge bg-warning ms-2" *ngIf="solicitacoesPendentes > 0">
+                  {{ solicitacoesPendentes }}
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Últimas Solicitações -->
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">
+                <i class="bi bi-clock-history me-2"></i>
+                Últimas Solicitações Enviadas
+              </h5>
+              <a routerLink="/arrendatario/solicitacoes" class="btn btn-sm btn-outline-primary">
+                Ver Todas
+              </a>
+            </div>
+          </div>
+          <div class="card-body">
+            <div *ngIf="ultimasSolicitacoes.length === 0" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox fs-1"></i>
+              <p class="mt-3">Nenhuma solicitação enviada ainda</p>
+              <button class="btn btn-primary" (click)="pesquisarImoveis()">
+                <i class="bi bi-search me-2"></i>
+                Pesquisar Imóveis
+              </button>
+            </div>
+
+            <div class="list-group list-group-flush" *ngIf="ultimasSolicitacoes.length > 0">
+              <div class="list-group-item px-0" *ngFor="let solicitacao of ultimasSolicitacoes">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ solicitacao.imovelTitulo }}</h6>
+                    <div class="d-flex gap-3 small text-muted mb-2">
+                      <span>
+                        <i class="bi bi-tag me-1"></i>
+                        {{ formatarPreco(solicitacao.imovelPreco || 0) }}/mês
+                      </span>
+                      <span>
+                        <i class="bi bi-person me-1"></i>
+                        Proprietário: {{ solicitacao.proprietarioNome }}
+                      </span>
+                    </div>
+                    <small class="text-muted">
+                      <i class="bi bi-clock me-1"></i>
+                      Enviada em {{ solicitacao.dataSolicitacao | date:'dd/MM/yyyy HH:mm' }}
+                    </small>
+                  </div>
+                  <span class="badge" [class]="'bg-' + obterCorStatus(solicitacao.status)">
+                    {{ obterTextoStatus(solicitacao.status) }}
+                  </span>
+                </div>
+                
+                <div class="mt-2" *ngIf="solicitacao.observacoes && solicitacao.status !== 'pendente'">
+                  <div class="alert alert-light small mb-0">
+                    <strong>Resposta do proprietário:</strong><br>
+                    {{ solicitacao.observacoes }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dicas -->
+    <div class="alert alert-info mt-4">
+      <i class="bi bi-lightbulb me-2"></i>
+      <strong>Dica:</strong> Quando enviar uma solicitação, seja claro e educado na mensagem. Isso aumenta as chances de ser aceite!
+    </div>
+  </div>
+</div>

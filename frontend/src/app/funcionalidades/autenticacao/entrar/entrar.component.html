@@ -1,0 +1,104 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow">
+        <div class="card-body p-5">
+          <!-- Logo e Título -->
+          <div class="text-center mb-4">
+            <i class="bi bi-house-door-fill text-primary" style="font-size: 3rem;"></i>
+            <h3 class="fw-bold mt-3">Entrar no ArrendaJá</h3>
+            <p class="text-muted">Aceda à sua conta</p>
+          </div>
+
+          <!-- Mensagem de Erro -->
+          <div class="alert alert-danger d-flex align-items-center" *ngIf="erro">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ erro }}
+          </div>
+
+          <!-- Formulário -->
+          <form [formGroup]="formulario" (ngSubmit)="entrar()">
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="bi bi-envelope me-1"></i>
+                Email
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                formControlName="email"
+                placeholder="seu@email.com"
+                [class.is-invalid]="email?.invalid && email?.touched">
+              <div class="invalid-feedback" *ngIf="email?.touched">
+                <span *ngIf="email?.errors?.['required']">Email é obrigatório</span>
+                <span *ngIf="email?.errors?.['email']">Email inválido</span>
+              </div>
+            </div>
+
+            <!-- Senha -->
+            <div class="mb-3">
+              <label for="senha" class="form-label">
+                <i class="bi bi-lock me-1"></i>
+                Senha
+              </label>
+              <div class="input-group">
+                <input 
+                  [type]="mostrarSenha ? 'text' : 'password'" 
+                  class="form-control" 
+                  id="senha" 
+                  formControlName="senha"
+                  placeholder="••••••••"
+                  [class.is-invalid]="senha?.invalid && senha?.touched">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  (click)="alternarVisibilidadeSenha()">
+                  <i [class]="mostrarSenha ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="senha?.touched && senha?.invalid">
+                <span *ngIf="senha?.errors?.['required']">Senha é obrigatória</span>
+                <span *ngIf="senha?.errors?.['minlength']">Senha deve ter no mínimo 6 caracteres</span>
+              </div>
+            </div>
+
+            <!-- Esqueceu a senha -->
+            <div class="mb-3 text-end">
+              <a routerLink="/recuperar-senha" class="text-decoration-none small">
+                Esqueceu a senha?
+              </a>
+            </div>
+
+            <!-- Botão Entrar -->
+            <button 
+              type="submit" 
+              class="btn btn-primary w-100 py-2"
+              [disabled]="carregando">
+              <span *ngIf="!carregando">
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Entrar
+              </span>
+              <span *ngIf="carregando">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                A entrar...
+              </span>
+            </button>
+          </form>
+
+          <!-- Link para Registar -->
+          <hr class="my-4">
+          <div class="text-center">
+            <p class="text-muted mb-0">
+              Não tem uma conta?
+              <a routerLink="/registar" class="text-decoration-none fw-bold">
+                Registar agora
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

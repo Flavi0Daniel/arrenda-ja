@@ -1,0 +1,235 @@
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-inbox me-2"></i>
+      Minhas Solicitações
+    </h2>
+    <p class="text-muted mb-0">Acompanhe o status das suas solicitações de arrendamento</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="btn-group" role="group">
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="todas" 
+          value="todas"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()"
+          checked>
+        <label class="btn btn-outline-primary" for="todas">
+          <i class="bi bi-list me-1"></i>
+          Todas
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="pendente" 
+          value="pendente"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-warning" for="pendente">
+          <i class="bi bi-clock me-1"></i>
+          Pendentes
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="aceite" 
+          value="aceite"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-success" for="aceite">
+          <i class="bi bi-check-circle me-1"></i>
+          Aceites
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="recusada" 
+          value="recusada"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-danger" for="recusada">
+          <i class="bi bi-x-circle me-1"></i>
+          Recusadas
+        </label>
+
+        <input 
+          type="radio" 
+          class="btn-check" 
+          name="filtroStatus" 
+          id="cancelada" 
+          value="cancelada"
+          [(ngModel)]="filtroStatus"
+          (change)="aplicarFiltro()">
+        <label class="btn btn-outline-secondary" for="cancelada">
+          <i class="bi bi-dash-circle me-1"></i>
+          Canceladas
+        </label>
+      </div>
+
+      <span class="ms-3 text-muted small">
+        Mostrando {{ solicitacoesFiltradas.length }} de {{ solicitacoes.length }} solicitações
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <app-carregamento 
+    *ngIf="carregando" 
+    mensagem="A carregar solicitações...">
+  </app-carregamento>
+
+  <!-- Erro -->
+  <div class="alert alert-danger" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+  </div>
+
+  <!-- Lista de Solicitações -->
+  <div *ngIf="!carregando && !erro">
+    <!-- Nenhuma solicitação -->
+    <div class="text-center py-5" *ngIf="solicitacoes.length === 0">
+      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhuma solicitação enviada ainda</h4>
+      <p class="text-muted">Pesquise imóveis e envie sua primeira solicitação</p>
+      <a routerLink="/imoveis" class="btn btn-primary">
+        <i class="bi bi-search me-2"></i>
+        Pesquisar Imóveis
+      </a>
+    </div>
+
+    <!-- Cards de Solicitações -->
+    <div class="row g-4" *ngIf="solicitacoesFiltradas.length > 0">
+      <div class="col-12" *ngFor="let solicitacao of solicitacoesFiltradas">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="row">
+              <!-- Informações do Imóvel -->
+              <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <h5 class="mb-0">{{ solicitacao.imovelTitulo }}</h5>
+                  <span class="badge" [class]="'bg-' + obterCorStatus(solicitacao.status)">
+                    {{ obterTextoStatus(solicitacao.status) }}
+                  </span>
+                </div>
+
+                <div class="mb-3">
+                  <h4 class="text-primary mb-0">
+                    {{ formatarPreco(solicitacao.imovelPreco || 0) }}
+                    <small class="text-muted fs-6">/mês</small>
+                  </h4>
+                </div>
+
+                <!-- Informações do Proprietário -->
+                <div class="mb-3">
+                  <h6 class="text-muted small mb-1">Proprietário</h6>
+                  <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2"
+                         style="width: 40px; height: 40px;">
+                      <i class="bi bi-person text-primary"></i>
+                    </div>
+                    <div>
+                      <p class="mb-0 fw-bold">{{ solicitacao.proprietarioNome }}</p>
+                      <small class="text-muted" *ngIf="solicitacao.proprietarioTelefone">
+                        <i class="bi bi-telephone me-1"></i>
+                        {{ solicitacao.proprietarioTelefone }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mensagem Inicial -->
+                <div class="mb-3" *ngIf="solicitacao.mensagemInicial">
+                  <h6 class="text-muted small mb-1">Sua Mensagem</h6>
+                  <div class="alert alert-light mb-0">
+                    <p class="mb-0 small">{{ solicitacao.mensagemInicial }}</p>
+                  </div>
+                </div>
+
+                <!-- Resposta do Proprietário -->
+                <div class="mb-3" *ngIf="solicitacao.observacoes && solicitacao.status !== 'pendente'">
+                  <h6 class="text-muted small mb-1">Resposta do Proprietário</h6>
+                  <div class="alert mb-0"
+                       [class.alert-success]="solicitacao.status === 'aceite'"
+                       [class.alert-danger]="solicitacao.status === 'recusada'">
+                    <p class="mb-0 small">{{ solicitacao.observacoes }}</p>
+                  </div>
+                </div>
+
+                <!-- Datas -->
+                <div class="d-flex gap-3 small text-muted">
+                  <span>
+                    <i class="bi bi-clock me-1"></i>
+                    Enviada em {{ solicitacao.dataSolicitacao | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                  <span *ngIf="solicitacao.dataResposta && solicitacao.status !== 'pendente'">
+                    <i class="bi bi-check2 me-1"></i>
+                    Respondida em {{ solicitacao.dataResposta | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Ações -->
+              <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-flex flex-column gap-2">
+                  <button 
+                    class="btn btn-outline-primary btn-sm"
+                    (click)="verImovel(solicitacao.imovelId)">
+                    <i class="bi bi-eye me-1"></i>
+                    Ver Imóvel
+                  </button>
+
+                  <button 
+                    class="btn btn-outline-danger btn-sm"
+                    *ngIf="solicitacao.status === 'pendente'"
+                    (click)="cancelarSolicitacao(solicitacao.id)">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancelar Solicitação
+                  </button>
+
+                  <!-- Informações baseadas no status -->
+                  <div class="alert alert-success small mb-0 mt-2" *ngIf="solicitacao.status === 'aceite'">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    <strong>Parabéns!</strong><br>
+                    Entre em contacto com o proprietário para finalizar o arrendamento.
+                  </div>
+
+                  <div class="alert alert-warning small mb-0 mt-2" *ngIf="solicitacao.status === 'pendente'">
+                    <i class="bi bi-clock-fill me-1"></i>
+                    Aguardando resposta do proprietário...
+                  </div>
+
+                  <div class="alert alert-secondary small mb-0 mt-2" *ngIf="solicitacao.status === 'recusada'">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Continue procurando outros imóveis disponíveis.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nenhum resultado no filtro -->
+    <div class="text-center py-5" *ngIf="solicitacoesFiltradas.length === 0 && solicitacoes.length > 0">
+      <i class="bi bi-search fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhuma solicitação com este status</h4>
+      <button class="btn btn-outline-primary" (click)="filtroStatus = 'todas'; aplicarFiltro()">
+        Mostrar Todas
+      </button>
+    </div>
+  </div>
+</div>

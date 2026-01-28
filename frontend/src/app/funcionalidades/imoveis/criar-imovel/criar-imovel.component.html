@@ -1,0 +1,399 @@
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <!-- Cabeçalho -->
+      <div class="text-center mb-4">
+        <h2 class="fw-bold">
+          <i class="bi bi-plus-circle me-2"></i>
+          Publicar Novo Imóvel
+        </h2>
+        <p class="text-muted">
+          Preencha as informações do seu imóvel para publicar
+        </p>
+      </div>
+
+      <!-- Indicador de Passos -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="flex-fill text-center" 
+               [class.text-primary]="passoAtual >= 1"
+               [class.fw-bold]="passoAtual === 1">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                 [class.bg-primary]="passoAtual >= 1"
+                 [class.bg-secondary]="passoAtual < 1"
+                 [class.text-white]="passoAtual >= 1"
+                 style="width: 40px; height: 40px;">
+              <i class="bi bi-info-circle" *ngIf="passoAtual === 1"></i>
+              <i class="bi bi-check" *ngIf="passoAtual > 1"></i>
+              <span *ngIf="passoAtual < 1">1</span>
+            </div>
+            <div class="small">Informações Básicas</div>
+          </div>
+          
+          <div class="flex-fill">
+            <hr [class.border-primary]="passoAtual >= 2" class="border-2">
+          </div>
+
+          <div class="flex-fill text-center"
+               [class.text-primary]="passoAtual >= 2"
+               [class.fw-bold]="passoAtual === 2">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                 [class.bg-primary]="passoAtual >= 2"
+                 [class.bg-secondary]="passoAtual < 2"
+                 [class.text-white]="passoAtual >= 2"
+                 style="width: 40px; height: 40px;">
+              <i class="bi bi-currency-exchange" *ngIf="passoAtual === 2"></i>
+              <i class="bi bi-check" *ngIf="passoAtual > 2"></i>
+              <span *ngIf="passoAtual < 2">2</span>
+            </div>
+            <div class="small">Detalhes e Preço</div>
+          </div>
+
+          <div class="flex-fill">
+            <hr [class.border-primary]="passoAtual >= 3" class="border-2">
+          </div>
+
+          <div class="flex-fill text-center"
+               [class.text-primary]="passoAtual >= 3"
+               [class.fw-bold]="passoAtual === 3">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                 [class.bg-primary]="passoAtual >= 3"
+                 [class.bg-secondary]="passoAtual < 3"
+                 [class.text-white]="passoAtual >= 3"
+                 style="width: 40px; height: 40px;">
+              <i class="bi bi-images" *ngIf="passoAtual === 3"></i>
+              <span *ngIf="passoAtual < 3">3</span>
+            </div>
+            <div class="small">Fotos e Extras</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensagem de Sucesso -->
+      <div class="alert alert-success" *ngIf="sucesso">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        Imóvel publicado com sucesso! Aguarde aprovação do administrador.
+        A redirecionar...
+      </div>
+
+      <!-- Mensagem de Erro -->
+      <div class="alert alert-danger" *ngIf="erro">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ erro }}
+      </div>
+
+      <!-- Formulário -->
+      <form [formGroup]="formulario" (ngSubmit)="publicar()" *ngIf="!sucesso">
+        <div class="card shadow">
+          <div class="card-body p-4">
+            
+            <!-- PASSO 1: Informações Básicas -->
+            <div *ngIf="passoAtual === 1">
+              <h4 class="mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                Informações Básicas
+              </h4>
+
+              <!-- Título -->
+              <div class="mb-3">
+                <label for="titulo" class="form-label">
+                  Título do Anúncio *
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="titulo" 
+                  formControlName="titulo"
+                  placeholder="Ex: Apartamento T2 Moderno em Talatona"
+                  [class.is-invalid]="titulo?.invalid && titulo?.touched">
+                <div class="invalid-feedback" *ngIf="titulo?.touched">
+                  <span *ngIf="titulo?.errors?.['required']">Título é obrigatório</span>
+                  <span *ngIf="titulo?.errors?.['minlength']">O título deve ter no mínimo 10 caracteres</span>
+                </div>
+                <small class="text-muted">Mínimo 10 caracteres</small>
+              </div>
+
+              <!-- Descrição -->
+              <div class="mb-3">
+                <label for="descricao" class="form-label">
+                  Descrição *
+                </label>
+                <textarea 
+                  class="form-control" 
+                  id="descricao" 
+                  formControlName="descricao"
+                  rows="5"
+                  placeholder="Descreva detalhadamente o seu imóvel: características, localização, comodidades, etc."
+                  [class.is-invalid]="descricao?.invalid && descricao?.touched"></textarea>
+                <div class="invalid-feedback" *ngIf="descricao?.touched">
+                  <span *ngIf="descricao?.errors?.['required']">Descrição é obrigatória</span>
+                  <span *ngIf="descricao?.errors?.['minlength']">A descrição deve ter no mínimo 50 caracteres</span>
+                </div>
+                <small class="text-muted">Mínimo 50 caracteres</small>
+              </div>
+
+              <div class="row">
+                <!-- Tipologia -->
+                <div class="col-md-6 mb-3">
+                  <label for="tipologia" class="form-label">
+                    Tipologia *
+                  </label>
+                  <select 
+                    class="form-select" 
+                    id="tipologia" 
+                    formControlName="tipologia"
+                    [class.is-invalid]="tipologia?.invalid && tipologia?.touched">
+                    <option value="">Selecione...</option>
+                    <option *ngFor="let tip of tipologias" [value]="tip">{{ tip }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="tipologia?.touched && tipologia?.errors?.['required']">
+                    Tipologia é obrigatória
+                  </div>
+                </div>
+
+                <!-- Condomínio -->
+                <div class="col-md-6 mb-3">
+                  <label for="condominio" class="form-label">
+                    Condomínio *
+                  </label>
+                  <select 
+                    class="form-select" 
+                    id="condominio" 
+                    formControlName="condominioId"
+                    [class.is-invalid]="condominioId?.invalid && condominioId?.touched">
+                    <option value="">Selecione...</option>
+                    <option *ngFor="let cond of condominios" [value]="cond.id">
+                      {{ cond.nome }} - {{ cond.bairro }}, {{ cond.municipio }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="condominioId?.touched && condominioId?.errors?.['required']">
+                    Condomínio é obrigatório
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASSO 2: Detalhes e Preço -->
+            <div *ngIf="passoAtual === 2">
+              <h4 class="mb-4">
+                <i class="bi bi-currency-exchange me-2"></i>
+                Detalhes e Preço
+              </h4>
+
+              <!-- Preço Mensal -->
+              <div class="mb-3">
+                <label for="preco" class="form-label">
+                  Preço Mensal (Kz) *
+                </label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="preco" 
+                  formControlName="precoMensal"
+                  placeholder="Ex: 150000"
+                  [class.is-invalid]="precoMensal?.invalid && precoMensal?.touched">
+                <div class="invalid-feedback" *ngIf="precoMensal?.touched">
+                  <span *ngIf="precoMensal?.errors?.['required']">Preço é obrigatório</span>
+                  <span *ngIf="precoMensal?.errors?.['min']">Preço deve ser maior que zero</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <!-- Área -->
+                <div class="col-md-4 mb-3">
+                  <label for="area" class="form-label">
+                    Área (m²)
+                  </label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="area" 
+                    formControlName="areaMetrosQuadrados"
+                    placeholder="Ex: 85">
+                </div>
+
+                <!-- Quartos -->
+                <div class="col-md-4 mb-3">
+                  <label for="quartos" class="form-label">
+                    Nº Quartos
+                  </label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="quartos" 
+                    formControlName="numeroQuartos"
+                    placeholder="Ex: 2">
+                </div>
+
+                <!-- Casas de Banho -->
+                <div class="col-md-4 mb-3">
+                  <label for="wc" class="form-label">
+                    Nº WC
+                  </label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="wc" 
+                    formControlName="numeroCasasBanho"
+                    placeholder="Ex: 2">
+                </div>
+              </div>
+
+              <!-- Data Disponibilidade -->
+              <div class="mb-3">
+                <label for="disponibilidade" class="form-label">
+                  Data de Disponibilidade
+                </label>
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  id="disponibilidade" 
+                  formControlName="dataDisponibilidade">
+                <small class="text-muted">Quando o imóvel estará disponível?</small>
+              </div>
+            </div>
+
+            <!-- PASSO 3: Fotos e Extras -->
+            <div *ngIf="passoAtual === 3">
+              <h4 class="mb-4">
+                <i class="bi bi-images me-2"></i>
+                Fotos e Características Extras
+              </h4>
+
+              <!-- Upload de Fotos -->
+              <div class="mb-4">
+                <label class="form-label">
+                  Fotos do Imóvel * (Mínimo 1, Máximo 10)
+                </label>
+                <div class="border rounded p-4 text-center bg-light">
+                  <input 
+                    type="file" 
+                    class="d-none" 
+                    #fileInput
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    multiple
+                    (change)="onFotosChange($event)">
+                  
+                  <button 
+                    type="button" 
+                    class="btn btn-primary"
+                    (click)="fileInput.click()">
+                    <i class="bi bi-cloud-upload me-2"></i>
+                    Selecionar Fotos
+                  </button>
+                  <p class="text-muted small mt-2 mb-0">
+                    JPG, PNG ou WEBP - Máximo 5MB por foto
+                  </p>
+                </div>
+
+                <!-- Preview das Fotos -->
+                <div class="row g-3 mt-3" *ngIf="previewFotos.length > 0">
+                  <div class="col-md-3" *ngFor="let preview of previewFotos; let i = index">
+                    <div class="position-relative">
+                      <img [src]="preview" class="img-thumbnail w-100" style="height: 150px; object-fit: cover;">
+                      <button 
+                        type="button" 
+                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                        (click)="removerFoto(i)">
+                        <i class="bi bi-x"></i>
+                      </button>
+                      <span class="badge bg-primary position-absolute bottom-0 start-0 m-1" *ngIf="i === 0">
+                        Principal
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Características Extras -->
+              <div class="mb-3">
+                <label class="form-label">Comodidades</label>
+                
+                <div class="form-check mb-2">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="garagem"
+                    formControlName="temGaragem">
+                  <label class="form-check-label" for="garagem">
+                    <i class="bi bi-car-front me-2"></i>
+                    Tem Garagem
+                  </label>
+                </div>
+
+                <div class="form-check mb-2">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="piscina"
+                    formControlName="temPiscina">
+                  <label class="form-check-label" for="piscina">
+                    <i class="bi bi-water me-2"></i>
+                    Tem Piscina
+                  </label>
+                </div>
+
+                <div class="form-check">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="mobilado"
+                    formControlName="estaMobilado">
+                  <label class="form-check-label" for="mobilado">
+                    <i class="bi bi-house-check me-2"></i>
+                    Está Mobilado
+                  </label>
+                </div>
+              </div>
+
+              <!-- Aviso -->
+              <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                Após publicar, seu imóvel será analisado por um administrador antes de ficar visível no site.
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Botões de Navegação -->
+          <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary"
+                (click)="passoAnterior()"
+                [disabled]="passoAtual === 1 || carregando">
+                <i class="bi bi-arrow-left me-2"></i>
+                Voltar
+              </button>
+
+              <button 
+                type="button" 
+                class="btn btn-primary"
+                *ngIf="passoAtual < totalPassos"
+                (click)="proximoPasso()">
+                Próximo
+                <i class="bi bi-arrow-right ms-2"></i>
+              </button>
+
+              <button 
+                type="submit" 
+                class="btn btn-success"
+                *ngIf="passoAtual === totalPassos"
+                [disabled]="carregando">
+                <span *ngIf="!carregando">
+                  <i class="bi bi-check-circle me-2"></i>
+                  Publicar Imóvel
+                </span>
+                <span *ngIf="carregando">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  A publicar...
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

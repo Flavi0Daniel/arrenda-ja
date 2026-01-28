@@ -1,0 +1,11 @@
+.text-justify {
+  text-align: justify;
+}
+
+.sticky-top {
+  position: sticky;
+}
+
+.modal.show {
+  display: block;
+}

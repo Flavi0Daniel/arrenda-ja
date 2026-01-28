@@ -1,0 +1,214 @@
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body p-5">
+          <!-- Logo e Título -->
+          <div class="text-center mb-4">
+            <i class="bi bi-person-plus-fill text-primary" style="font-size: 3rem;"></i>
+            <h3 class="fw-bold mt-3">Criar Conta</h3>
+            <p class="text-muted">Junte-se ao ArrendaJá</p>
+          </div>
+
+          <!-- Mensagem de Sucesso -->
+          <div class="alert alert-success d-flex align-items-center" *ngIf="sucesso">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            Conta criada com sucesso! A redirecionar...
+          </div>
+
+          <!-- Mensagem de Erro -->
+          <div class="alert alert-danger d-flex align-items-center" *ngIf="erro">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ erro }}
+          </div>
+
+          <!-- Formulário -->
+          <form [formGroup]="formulario" (ngSubmit)="registar()" *ngIf="!sucesso">
+            <!-- Nome Completo -->
+            <div class="mb-3">
+              <label for="nomeCompleto" class="form-label">
+                <i class="bi bi-person me-1"></i>
+                Nome Completo
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nomeCompleto" 
+                formControlName="nomeCompleto"
+                placeholder="Seu nome completo"
+                [class.is-invalid]="nomeCompleto?.invalid && nomeCompleto?.touched">
+              <div class="invalid-feedback" *ngIf="nomeCompleto?.touched">
+                <span *ngIf="nomeCompleto?.errors?.['required']">Nome é obrigatório</span>
+                <span *ngIf="nomeCompleto?.errors?.['minlength']">Nome deve ter no mínimo 3 caracteres</span>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label">
+                <i class="bi bi-envelope me-1"></i>
+                Email
+              </label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                formControlName="email"
+                placeholder="seu@email.com"
+                [class.is-invalid]="email?.invalid && email?.touched">
+              <div class="invalid-feedback" *ngIf="email?.touched">
+                <span *ngIf="email?.errors?.['required']">Email é obrigatório</span>
+                <span *ngIf="email?.errors?.['email']">Email inválido</span>
+              </div>
+            </div>
+
+            <!-- Telefone -->
+            <div class="mb-3">
+              <label for="telefone" class="form-label">
+                <i class="bi bi-telephone me-1"></i>
+                Telefone (Opcional)
+              </label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                id="telefone" 
+                formControlName="telefone"
+                placeholder="923456789"
+                [class.is-invalid]="telefone?.invalid && telefone?.touched">
+              <div class="invalid-feedback" *ngIf="telefone?.touched && telefone?.errors?.['pattern']">
+                Formato inválido. Use: 923456789 ou +244923456789
+              </div>
+            </div>
+
+            <!-- Tipo de Utilizador -->
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="bi bi-person-badge me-1"></i>
+                Tipo de Conta
+              </label>
+              <div class="row">
+                <div class="col-6">
+                  <div class="form-check card p-3" [class.border-primary]="tipoUtilizador?.value === 'arrendatario'">
+                    <input 
+                      class="form-check-input" 
+                      type="radio" 
+                      id="arrendatario" 
+                      formControlName="tipoUtilizador"
+                      value="arrendatario">
+                    <label class="form-check-label w-100" for="arrendatario" style="cursor: pointer;">
+                      <i class="bi bi-search d-block fs-4 mb-2"></i>
+                      <strong>Arrendatário</strong>
+                      <small class="d-block text-muted">Procuro imóvel</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-check card p-3" [class.border-primary]="tipoUtilizador?.value === 'proprietario'">
+                    <input 
+                      class="form-check-input" 
+                      type="radio" 
+                      id="proprietario" 
+                      formControlName="tipoUtilizador"
+                      value="proprietario">
+                    <label class="form-check-label w-100" for="proprietario" style="cursor: pointer;">
+                      <i class="bi bi-building d-block fs-4 mb-2"></i>
+                      <strong>Proprietário</strong>
+                      <small class="d-block text-muted">Tenho imóveis</small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Senha -->
+            <div class="mb-3">
+              <label for="senha" class="form-label">
+                <i class="bi bi-lock me-1"></i>
+                Senha
+              </label>
+              <div class="input-group">
+                <input 
+                  [type]="mostrarSenha ? 'text' : 'password'" 
+                  class="form-control" 
+                  id="senha" 
+                  formControlName="senha"
+                  placeholder="••••••••"
+                  [class.is-invalid]="senha?.invalid && senha?.touched">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  (click)="alternarVisibilidadeSenha()">
+                  <i [class]="mostrarSenha ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="senha?.touched && senha?.invalid">
+                <span *ngIf="senha?.errors?.['required']">Senha é obrigatória</span>
+                <span *ngIf="senha?.errors?.['minlength']">Senha deve ter no mínimo 6 caracteres</span>
+              </div>
+            </div>
+
+            <!-- Confirmar Senha -->
+            <div class="mb-3">
+              <label for="confirmarSenha" class="form-label">
+                <i class="bi bi-lock-fill me-1"></i>
+                Confirmar Senha
+              </label>
+              <div class="input-group">
+                <input 
+                  [type]="mostrarConfirmarSenha ? 'text' : 'password'" 
+                  class="form-control" 
+                  id="confirmarSenha" 
+                  formControlName="confirmarSenha"
+                  placeholder="••••••••"
+                  [class.is-invalid]="(confirmarSenha?.invalid || formulario.errors?.['senhasDiferentes']) && confirmarSenha?.touched">
+                <button 
+                  class="btn btn-outline-secondary" 
+                  type="button"
+                  (click)="alternarVisibilidadeConfirmarSenha()">
+                  <i [class]="mostrarConfirmarSenha ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="confirmarSenha?.touched">
+                <span *ngIf="confirmarSenha?.errors?.['required']">Confirme a senha</span>
+                <span *ngIf="formulario.errors?.['senhasDiferentes']">As senhas não coincidem</span>
+              </div>
+            </div>
+
+            <!-- Termos -->
+            <div class="mb-3 small text-muted">
+              Ao criar uma conta, você concorda com os 
+              <a href="#" class="text-decoration-none">Termos de Uso</a> e 
+              <a href="#" class="text-decoration-none">Política de Privacidade</a>.
+            </div>
+
+            <!-- Botão Registar -->
+            <button 
+              type="submit" 
+              class="btn btn-primary w-100 py-2"
+              [disabled]="carregando">
+              <span *ngIf="!carregando">
+                <i class="bi bi-person-plus me-2"></i>
+                Criar Conta
+              </span>
+              <span *ngIf="carregando">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                A criar conta...
+              </span>
+            </button>
+          </form>
+
+          <!-- Link para Login -->
+          <hr class="my-4">
+          <div class="text-center">
+            <p class="text-muted mb-0">
+              Já tem uma conta?
+              <a routerLink="/entrar" class="text-decoration-none fw-bold">
+                Entrar agora
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

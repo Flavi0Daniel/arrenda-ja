@@ -1,8 +1,25 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
+// Módulos customizados
+import { CompartilhadosModule } from './compartilhados/compartilhados.module';
+import { AutenticacaoModule } from './funcionalidades/autenticacao/autenticacao.module';
+import { InicioModule } from './funcionalidades/inicio/inicio.module';
+import { ImoveisModule } from './funcionalidades/imoveis/imoveis.module';
+import { ProprietarioModule } from './funcionalidades/proprietario/proprietario.module';
+import { ArrendatarioModule } from './funcionalidades/arrendatario/arrendatario.module';
+
+
+
+
+// Interceptors
+import { autenticacaoInterceptor } from './nucleos/interceptors/autenticacao.interceptor';
+import { erroInterceptor } from './nucleos/interceptors/erro.interceptor';
 
 @NgModule({
   declarations: [
@@ -10,9 +27,21 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    CompartilhadosModule,
+    AutenticacaoModule,
+    InicioModule,
+    ImoveisModule,
+    ProprietarioModule,
+    ArrendatarioModule
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(
+      withInterceptors([autenticacaoInterceptor, erroInterceptor])
+    )
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

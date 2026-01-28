@@ -28,6 +28,7 @@ export interface Imovel {
     provincia: string;
     municipio: string;
     bairro: string;
+    descricao?: string;
   };
   fotos?: FotoImovel[];
   fotoPrincipal?: string;
