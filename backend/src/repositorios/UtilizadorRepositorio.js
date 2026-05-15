@@ -97,8 +97,10 @@ class UtilizadorRepositorio {
             parametros.push(tipoUtilizador);
         }
 
-        query += ' ORDER BY data_criacao DESC LIMIT ? OFFSET ?';
-        parametros.push(itensPorPagina, deslocamento);
+        query += ' ORDER BY data_criacao DESC';
+        
+        // CORREÇÃO: Usar template literals em vez de prepared statements para LIMIT/OFFSET
+        query += ` LIMIT ${itensPorPagina} OFFSET ${deslocamento}`;
 
         const [linhas] = await bd.execute(query, parametros);
         return linhas.map(linha => new Utilizador(linha));
@@ -128,6 +130,61 @@ class UtilizadorRepositorio {
             'UPDATE utilizadores SET esta_ativo = FALSE WHERE id = ?',
             [id]
         );
+    }
+
+    /**
+     * Atualizar utilizador (admin) - pode alterar tipo
+     */
+    async atualizarAdmin(id, dadosAtualizacao) {
+        const campos = [];
+        const valores = [];
+
+        if (dadosAtualizacao.nomeCompleto) {
+            campos.push('nome_completo = ?');
+            valores.push(dadosAtualizacao.nomeCompleto);
+        }
+        if (dadosAtualizacao.telefone !== undefined) {
+            campos.push('telefone = ?');
+            valores.push(dadosAtualizacao.telefone);
+        }
+        if (dadosAtualizacao.tipoUtilizador) {
+            campos.push('tipo_utilizador = ?');
+            valores.push(dadosAtualizacao.tipoUtilizador);
+        }
+
+        if (campos.length === 0) {
+            throw new Error('Nenhum campo para atualizar');
+        }
+
+        valores.push(id);
+
+        await bd.execute(
+            `UPDATE utilizadores SET ${campos.join(', ')} WHERE id = ?`,
+            valores
+        );
+
+        return this.buscarPorId(id);
+    }
+
+    /**
+     * Reativar utilizador
+     */
+    async reativar(id) {
+        await bd.execute(
+            'UPDATE utilizadores SET esta_ativo = TRUE WHERE id = ?',
+            [id]
+        );
+    }
+
+    /**
+     * Buscar por ID (incluindo inativos) - para admin
+     */
+    async buscarPorIdAdmin(id) {
+        const [linhas] = await bd.execute(
+            'SELECT * FROM utilizadores WHERE id = ?',
+            [id]
+        );
+        return linhas.length > 0 ? new Utilizador(linhas[0]) : null;
     }
 }
 

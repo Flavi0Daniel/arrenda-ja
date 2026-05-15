@@ -73,11 +73,27 @@ class ImovelControlador {
                 precoMaximo: req.query.precoMaximo ? parseFloat(req.query.precoMaximo) : null,
                 provincia: req.query.provincia,
                 municipio: req.query.municipio,
-                bairro: req.query.bairro,
-                temGaragem: req.query.temGaragem === 'true',
-                temPiscina: req.query.temPiscina === 'true',
-                estaMobilado: req.query.estaMobilado === 'true'
+                bairro: req.query.bairro
             };
+
+            // Converter booleanos CORRETAMENTE
+            if (req.query.temGaragem === 'true') {
+                filtros.temGaragem = true;
+            } else if (req.query.temGaragem === 'false') {
+                filtros.temGaragem = false;
+            }
+
+            if (req.query.temPiscina === 'true') {
+                filtros.temPiscina = true;
+            } else if (req.query.temPiscina === 'false') {
+                filtros.temPiscina = false;
+            }
+
+            if (req.query.estaMobilado === 'true') {
+                filtros.estaMobilado = true;
+            } else if (req.query.estaMobilado === 'false') {
+                filtros.estaMobilado = false;
+            }
 
             // Remover filtros vazios
             Object.keys(filtros).forEach(chave => {
@@ -100,6 +116,7 @@ class ImovelControlador {
                 }
             });
         } catch (erro) {
+            console.error('Erro na pesquisa:', erro);
             res.status(400).json({
                 sucesso: false,
                 mensagem: erro.message
@@ -232,6 +249,87 @@ class ImovelControlador {
             });
         }
     }
+
+    /**
+     * GET /api/imoveis/admin/todos
+     * Listar todos os imóveis (administrador)
+     */
+    async listarTodos(req, res) {
+        try {
+            const imoveis = await ImovelServico.listarTodos();
+            
+            res.json({
+                sucesso: true,
+                dados: imoveis
+            });
+        } catch (erro) {
+            res.status(400).json({
+                sucesso: false,
+                mensagem: erro.message
+            });
+        }
+    }
+
+
+
+    /**
+     * DELETE /api/imoveis/:id/fotos/:fotoId
+     * Remover foto do imóvel
+     */
+        async removerFoto(req, res) {
+        try {
+            const imovelId = parseInt(req.params.id);
+            const fotoId = parseInt(req.params.fotoId);
+            const proprietarioId = req.utilizador.id;
+
+            await ImovelServico.removerFoto(imovelId, fotoId, proprietarioId);
+
+            res.json({
+                sucesso: true,
+                mensagem: 'Foto removida com sucesso'
+            });
+        } catch (erro) {
+            res.status(400).json({
+                sucesso: false,
+                mensagem: erro.message
+            });
+        }
+    }
+
+
+    /**
+     * PATCH /api/imoveis/:id/meu-status
+     * Alterar status do próprio imóvel (proprietário)
+     */
+    async alterarMeuStatus(req, res) {
+        try {
+            const imovelId = parseInt(req.params.id);
+            const proprietarioId = req.utilizador.id;
+            const { status } = req.body;
+
+            // Validar status permitido para proprietário
+            const statusPermitidos = ['disponivel', 'arrendado', 'inativo'];
+            if (!statusPermitidos.includes(status)) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: 'Status inválido. Use: disponivel, arrendado ou inativo'
+                });
+            }
+
+            await ImovelServico.alterarMeuStatus(imovelId, status, proprietarioId);
+
+            res.json({
+                sucesso: true,
+                mensagem: 'Status atualizado com sucesso'
+            });
+        } catch (erro) {
+            res.status(400).json({
+                sucesso: false,
+                mensagem: erro.message
+            });
+        }
+    }
+
 }
 
 module.exports = new ImovelControlador();

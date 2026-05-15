@@ -1,0 +1,140 @@
+<div class="modal-backdrop show" (click)="fecharModal()"></div>
+
+<div class="modal show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-key me-2"></i>
+          Alterar Senha
+        </h5>
+        <button 
+          type="button" 
+          class="btn-close" 
+          (click)="fecharModal()"
+          [disabled]="processando">
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Mensagem de Sucesso -->
+        <div class="alert alert-success" *ngIf="sucesso">
+          <i class="bi bi-check-circle me-2"></i>
+          Senha alterada com sucesso! Fechando...
+        </div>
+
+        <!-- Mensagem de Erro -->
+        <div class="alert alert-danger" *ngIf="erro">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          {{ erro }}
+        </div>
+
+        <!-- Formulário -->
+        <form (ngSubmit)="alterarSenha()" *ngIf="!sucesso">
+          <!-- Senha Atual -->
+          <div class="mb-3">
+            <label class="form-label">Senha Atual *</label>
+            <div class="input-group">
+              <input 
+                [type]="mostrarSenhaAtual ? 'text' : 'password'" 
+                class="form-control" 
+                [(ngModel)]="senhaAtual"
+                name="senhaAtual"
+                required
+                [disabled]="processando"
+                placeholder="Digite sua senha atual">
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button"
+                (click)="toggleMostrarSenha('atual')"
+                [disabled]="processando">
+                <i class="bi" [class.bi-eye]="!mostrarSenhaAtual" [class.bi-eye-slash]="mostrarSenhaAtual"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Nova Senha -->
+          <div class="mb-3">
+            <label class="form-label">Nova Senha *</label>
+            <div class="input-group">
+              <input 
+                [type]="mostrarNovaSenha ? 'text' : 'password'" 
+                class="form-control" 
+                [(ngModel)]="novaSenha"
+                name="novaSenha"
+                required
+                minlength="6"
+                [disabled]="processando"
+                placeholder="Mínimo 6 caracteres">
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button"
+                (click)="toggleMostrarSenha('nova')"
+                [disabled]="processando">
+                <i class="bi" [class.bi-eye]="!mostrarNovaSenha" [class.bi-eye-slash]="mostrarNovaSenha"></i>
+              </button>
+            </div>
+            <small class="text-muted">Mínimo 6 caracteres</small>
+          </div>
+
+          <!-- Confirmar Nova Senha -->
+          <div class="mb-3">
+            <label class="form-label">Confirmar Nova Senha *</label>
+            <div class="input-group">
+              <input 
+                [type]="mostrarConfirmarSenha ? 'text' : 'password'" 
+                class="form-control" 
+                [(ngModel)]="confirmarSenha"
+                name="confirmarSenha"
+                required
+                [disabled]="processando"
+                placeholder="Digite a senha novamente">
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button"
+                (click)="toggleMostrarSenha('confirmar')"
+                [disabled]="processando">
+                <i class="bi" [class.bi-eye]="!mostrarConfirmarSenha" [class.bi-eye-slash]="mostrarConfirmarSenha"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Indicador de Força da Senha -->
+          <div class="mb-3" *ngIf="novaSenha.length > 0">
+            <small class="text-muted">Força da senha:</small>
+            <div class="progress" style="height: 5px;">
+              <div 
+                class="progress-bar"
+                [class.bg-danger]="novaSenha.length < 6"
+                [class.bg-warning]="novaSenha.length >= 6 && novaSenha.length < 8"
+                [class.bg-success]="novaSenha.length >= 8"
+                [style.width]="(novaSenha.length >= 8 ? 100 : novaSenha.length >= 6 ? 66 : 33) + '%'">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer" *ngIf="!sucesso">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="fecharModal()"
+          [disabled]="processando">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          (click)="alterarSenha()"
+          [disabled]="processando || !senhaAtual || !novaSenha || !confirmarSenha">
+          <span class="spinner-border spinner-border-sm me-2" *ngIf="processando"></span>
+          <i class="bi bi-check-lg me-1" *ngIf="!processando"></i>
+          Alterar Senha
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

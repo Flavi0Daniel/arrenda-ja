@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ImovelService } from '../../../servicos/imovel.service';
 import { SolicitacaoService } from '../../../servicos/solicitacao.service';
+import { EstatisticaService } from '../../../servicos/estatistica.service';
 import { AutenticacaoService } from '../../../servicos/autenticacao.service';
 import { Imovel } from '../../../modelos/imovel.model';
 import { Solicitacao } from '../../../modelos/solicitacao.model';
@@ -29,6 +30,7 @@ export class PainelProprietarioComponent implements OnInit {
   constructor(
     private imovelService: ImovelService,
     private solicitacaoService: SolicitacaoService,
+    private estatisticaService: EstatisticaService,
     public autenticacaoService: AutenticacaoService
   ) {}
 
@@ -41,20 +43,31 @@ export class PainelProprietarioComponent implements OnInit {
 
   carregarDados(): void {
     this.carregando = true;
+    
+    const utilizador = this.autenticacaoService.obterUtilizadorAtual();
+    if (!utilizador) return;
 
-    // Carregar imóveis
+    // Carregar estatísticas
+    this.estatisticaService.obterEstatisticasProprietario(utilizador.id).subscribe({
+      next: (resposta) => {
+        if (resposta.sucesso && resposta.dados) {
+          const dados = resposta.dados;
+          
+          this.totalImoveis = dados.imoveis.total;
+          this.imoveisDisponiveis = dados.imoveis.disponiveis;
+          this.imoveisArrendados = dados.imoveis.arrendados;
+          this.imoveisEmAnalise = dados.imoveis.em_analise;
+          this.solicitacoesPendentes = dados.solicitacoes.pendentes;
+        }
+      },
+      error: (erro) => console.error('Erro ao carregar estatísticas:', erro)
+    });
+
+    // Carregar últimos imóveis
     this.imovelService.listarMeus().subscribe({
       next: (resposta) => {
         if (resposta.sucesso && resposta.dados) {
-          const imoveis = resposta.dados;
-          
-          this.totalImoveis = imoveis.length;
-          this.imoveisDisponiveis = imoveis.filter(i => i.status === 'disponivel').length;
-          this.imoveisArrendados = imoveis.filter(i => i.status === 'arrendado').length;
-          this.imoveisEmAnalise = imoveis.filter(i => i.status === 'em_analise').length;
-          
-          // Últimos 3 imóveis
-          this.ultimosImoveis = imoveis.slice(0, 3);
+          this.ultimosImoveis = resposta.dados.slice(0, 3);
         }
         this.carregando = false;
       },
@@ -62,16 +75,6 @@ export class PainelProprietarioComponent implements OnInit {
         console.error('Erro ao carregar imóveis:', erro);
         this.carregando = false;
       }
-    });
-
-    // Carregar solicitações pendentes
-    this.solicitacaoService.contarPendentes().subscribe({
-      next: (resposta) => {
-        if (resposta.sucesso && resposta.dados) {
-          this.solicitacoesPendentes = resposta.dados.total;
-        }
-      },
-      error: (erro) => console.error('Erro ao contar solicitações:', erro)
     });
 
     // Carregar últimas solicitações

@@ -20,6 +20,15 @@ class Imovel {
         this.dataDisponibilidade = dados.data_disponibilidade;
         this.dataCriacao = dados.data_criacao;
         this.dataAtualizacao = dados.data_atualizacao;
+
+        // ADICIONAR ESTAS LINHAS:
+        this.fotoPrincipal = dados.foto_principal;  // ← ADICIONAR
+        this.foto_principal = dados.foto_principal; // ← ADICIONAR (para compatibilidade)
+        
+        // Campos extras
+        this.condominio = dados.condominio;
+        this.proprietario = dados.proprietario;
+        this.fotos = dados.fotos || [];
     }
 
     /**

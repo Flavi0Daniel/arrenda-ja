@@ -123,31 +123,31 @@
             </h4>
 
             <!-- Ações -->
-            <div class="d-grid gap-2">
-              <button 
-                class="btn btn-outline-primary btn-sm"
-                (click)="verDetalhes(imovel.id)">
-                <i class="bi bi-eye me-1"></i>
-                Ver Detalhes
-              </button>
-              
-              <div class="btn-group">
+              <div class="btn-group w-100">
+                <button 
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="verDetalhes(imovel.id)">
+                  <i class="bi bi-eye me-1"></i>
+                  Ver Detalhes
+                </button>
+                
                 <button 
                   class="btn btn-outline-secondary btn-sm"
-                  (click)="editarImovel(imovel.id)"
-                  *ngIf="imovel.status !== 'arrendado'">
+                  (click)="editarImovel(imovel.id)">
                   <i class="bi bi-pencil me-1"></i>
                   Editar
                 </button>
-                <button 
-                  class="btn btn-outline-success btn-sm"
-                  (click)="marcarComoArrendado(imovel.id)"
-                  *ngIf="imovel.status === 'disponivel'">
-                  <i class="bi bi-check-circle me-1"></i>
-                  Marcar Arrendado
-                </button>
               </div>
-            </div>
+
+              <!-- Marcar como Arrendado (só se estiver disponível) -->
+              <button 
+                class="btn btn-danger btn-sm w-100 mt-2"
+                *ngIf="imovel.status === 'disponivel'"
+                (click)="marcarComoArrendado(imovel.id)">
+                <i class="bi bi-lock me-1"></i>
+                Marcar como Arrendado
+              </button>
+
           </div>
         </div>
       </div>

@@ -11,12 +11,25 @@ const aplicacao = express();
 // =============================
 // CONFIGURAÇÕES DE SEGURANÇA
 // =============================
-aplicacao.use(helmet());
+// aplicacao.use(helmet());
+aplicacao.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "http://localhost:3000", "http://localhost:4200"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"]
+        }
+    }
+}));
 
-// Configuração do CORS
+// Configuração do CORS - permitir TUDO para desenvolvimento
 aplicacao.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-    credentials: true
+    origin: '*',  // Permite qualquer origem
+    credentials: false,  // Desabilitar credentials quando origin é *
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // =============================
@@ -46,7 +59,7 @@ aplicacao.use('/uploads', express.static(pastaUploads));
 // =============================
 // IMPORTAR ROTAS
 // =============================
-let rotasAutenticacao, rotasImoveis, rotasSolicitacoes, rotasMensagens, rotasCondominios, rotasUtilizadores;
+let rotasAutenticacao, rotasImoveis, rotasSolicitacoes, rotasMensagens, rotasCondominios, rotasUtilizadores, rotasEstatisticas;
 
 try {
     rotasAutenticacao = require('./src/rotas/autenticacao');
@@ -90,6 +103,14 @@ try {
     console.warn('⚠️  Rotas de utilizadores não encontradas');
 }
 
+// ← ADICIONAR AQUI
+try {
+    rotasEstatisticas = require('./src/rotas/estatisticas');
+    console.log('✅ Rotas de estatísticas carregadas');
+} catch (erro) {
+    console.warn('⚠️  Rotas de estatísticas não encontradas');
+}
+
 // =============================
 // ROTAS DA API
 // =============================
@@ -99,6 +120,7 @@ if (rotasSolicitacoes) aplicacao.use('/api/solicitacoes', rotasSolicitacoes);
 if (rotasMensagens) aplicacao.use('/api/mensagens', rotasMensagens);
 if (rotasCondominios) aplicacao.use('/api/condominios', rotasCondominios);
 if (rotasUtilizadores) aplicacao.use('/api/utilizadores', rotasUtilizadores);
+if (rotasEstatisticas) aplicacao.use('/api/estatisticas', rotasEstatisticas); // ← ADICIONAR AQUI
 
 // Rota de teste
 aplicacao.get('/api/status', (req, res) => {
@@ -113,7 +135,8 @@ aplicacao.get('/api/status', (req, res) => {
             solicitacoes: !!rotasSolicitacoes,
             mensagens: !!rotasMensagens,
             condominios: !!rotasCondominios,
-            utilizadores: !!rotasUtilizadores
+            utilizadores: !!rotasUtilizadores,
+            estatisticas: !!rotasEstatisticas // ← ADICIONAR AQUI
         }
     });
 });

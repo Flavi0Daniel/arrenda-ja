@@ -19,12 +19,26 @@ import { PainelArrendatarioComponent } from './funcionalidades/arrendatario/pain
 import { MinhasSolicitacoesComponent } from './funcionalidades/arrendatario/minhas-solicitacoes/minhas-solicitacoes.component';
 
 
+// Importar componentes do administrador
+import { PainelAdminComponent } from './funcionalidades/administrador/painel-admin/painel-admin.component';
+import { AprovarImoveisComponent } from './funcionalidades/administrador/aprovar-imoveis/aprovar-imoveis.component';
+
+// Importar componentes de mensagens
+import { ListaMensagensComponent } from './funcionalidades/mensagens/lista-mensagens/lista-mensagens.component';
+import { ConversaComponent } from './funcionalidades/mensagens/conversa/conversa.component';
+
+import { MeuPerfilComponent } from './funcionalidades/perfil/meu-perfil/meu-perfil.component';
+
+import { EditarImovelComponent } from './funcionalidades/imoveis/editar-imovel/editar-imovel.component';
+
+import { RelatoriosComponent } from './funcionalidades/administrador/relatorios/relatorios.component';
 
 // Guards
 import { autenticacaoGuard } from './nucleos/guards/autenticacao.guard';
 import { proprietarioGuard } from './nucleos/guards/proprietario.guard';
 import { arrendatarioGuard } from './nucleos/guards/arrendatario.guard';
-
+import { administradorGuard } from './nucleos/guards/administrador.guard';
+import { GestaoUtilizadoresComponent } from './funcionalidades/administrador/gestao-utilizadores/gestao-utilizadores.component';
 
 
 const routes: Routes = [
@@ -76,6 +90,59 @@ const routes: Routes = [
     path: 'arrendatario/solicitacoes', 
     component: MinhasSolicitacoesComponent,
     canActivate: [autenticacaoGuard, arrendatarioGuard]
+  },
+
+  // Administrador (Rotas Protegidas)
+  { 
+    path: 'administrador/painel', 
+    component: PainelAdminComponent,
+    canActivate: [autenticacaoGuard, administradorGuard]
+  },
+  { 
+    path: 'administrador/aprovar-imoveis', 
+    component: AprovarImoveisComponent,
+    canActivate: [autenticacaoGuard, administradorGuard]
+  },
+
+  // Adicionar rota (depois de aprovar-imoveis)
+  { 
+    path: 'administrador/gestao-utilizadores', 
+    component: GestaoUtilizadoresComponent,
+    canActivate: [autenticacaoGuard, administradorGuard]
+  },
+
+
+  // Rota de mensagens
+  { 
+    path: 'mensagens', 
+    component: ListaMensagensComponent,
+    canActivate: [autenticacaoGuard]
+  },
+  { 
+    path: 'mensagens/conversa/:id', 
+    component: ConversaComponent,
+    canActivate: [autenticacaoGuard]
+  },
+
+  // Rota para perfil
+  {
+    path: 'perfil',
+    component: MeuPerfilComponent,
+    canActivate: [autenticacaoGuard]
+  },
+
+  // Adicionar rota (depois de criar-imovel)
+  { 
+    path: 'proprietario/editar-imovel/:id', 
+    component: EditarImovelComponent,
+    canActivate: [autenticacaoGuard, proprietarioGuard]
+  },
+
+    // Adicionar rota (depois de gestao-utilizadores)
+  { 
+    path: 'administrador/relatorios', 
+    component: RelatoriosComponent,
+    canActivate: [autenticacaoGuard, administradorGuard]
   },
   
   

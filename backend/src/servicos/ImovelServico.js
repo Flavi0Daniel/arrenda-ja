@@ -185,6 +185,54 @@ class ImovelServico {
             throw new Error('Tipologia inválida');
         }
     }
+
+    /**
+     * Listar todos os imóveis (admin)
+     */
+    async listarTodos() {
+        return await ImovelRepositorio.listarTodos();
+    }
+
+    /**
+     * Remover foto do imóvel
+     */
+    async removerFoto(imovelId, fotoId, proprietarioId) {
+        // Verificar se o imóvel pertence ao proprietário
+        const imovel = await ImovelRepositorio.buscarPorId(imovelId);
+        
+        if (!imovel) {
+            throw new Error('Imóvel não encontrado');
+        }
+        
+        // CORREÇÃO: usar proprietarioId em vez de proprietario_id
+        if (imovel.proprietarioId !== proprietarioId) {
+            throw new Error('Você não tem permissão para remover fotos deste imóvel');
+        }
+
+        // Remover foto
+        await ImovelRepositorio.removerFoto(fotoId);
+    }
+
+    /**
+     * Alterar status do próprio imóvel (proprietário)
+     */
+    async alterarMeuStatus(imovelId, status, proprietarioId) {
+        // Verificar se o imóvel pertence ao proprietário
+        const imovel = await ImovelRepositorio.buscarPorId(imovelId);
+        
+        if (!imovel) {
+            throw new Error('Imóvel não encontrado');
+        }
+        
+        // CORREÇÃO: usar proprietarioId em vez de proprietario_id
+        if (imovel.proprietarioId !== proprietarioId) {
+            throw new Error('Você não tem permissão para alterar o status deste imóvel');
+        }
+
+        // Atualizar status
+        await ImovelRepositorio.atualizarStatus(imovelId, status);
+    }
+
 }
 
 module.exports = new ImovelServico();

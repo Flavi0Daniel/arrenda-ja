@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const UtilizadorRepositorio = require('../repositorios/UtilizadorRepositorio');
+const AutenticacaoServico = require('./AutenticacaoServico');
 
 /**
  * Serviço para gestão de utilizadores
@@ -85,6 +86,94 @@ class UtilizadorServico {
         }
         
         await UtilizadorRepositorio.desativar(utilizadorId);
+    }
+
+    //
+
+
+
+    /**
+     * Criar novo utilizador (admin)
+     */
+    async criar(dadosUtilizador) {
+        // Validações
+        if (!dadosUtilizador.email || !dadosUtilizador.senha) {
+            throw new Error('Email e senha são obrigatórios');
+        }
+
+        if (!dadosUtilizador.nomeCompleto) {
+            throw new Error('Nome completo é obrigatório');
+        }
+
+        const tiposPermitidos = ['proprietario', 'arrendatario', 'administrador'];
+        if (!tiposPermitidos.includes(dadosUtilizador.tipoUtilizador)) {
+            throw new Error('Tipo de utilizador inválido');
+        }
+
+        // Verificar se email já existe
+        const utilizadorExistente = await UtilizadorRepositorio.buscarPorEmail(dadosUtilizador.email);
+        if (utilizadorExistente) {
+            throw new Error('Já existe um utilizador com este email');
+        }
+
+        // Encriptar senha
+        const senhaEncriptada = await bcrypt.hash(dadosUtilizador.senha, 12);
+
+        // Criar utilizador
+        const novoUtilizador = await UtilizadorRepositorio.criar({
+            nomeCompleto: dadosUtilizador.nomeCompleto,
+            email: dadosUtilizador.email,
+            senha: senhaEncriptada,
+            telefone: dadosUtilizador.telefone || null,
+            tipoUtilizador: dadosUtilizador.tipoUtilizador,
+            fotoPerfil: null
+        });
+
+        return novoUtilizador.paraSemSenha();
+    }
+
+    /**
+     * Editar utilizador (admin)
+     */
+    async editar(utilizadorId, dadosAtualizacao) {
+        const utilizador = await UtilizadorRepositorio.buscarPorId(utilizadorId);
+        
+        if (!utilizador) {
+            throw new Error('Utilizador não encontrado');
+        }
+
+        // Permitir editar: nome, telefone, tipo de utilizador
+        const dadosPermitidos = {};
+
+        if (dadosAtualizacao.nomeCompleto) {
+            dadosPermitidos.nomeCompleto = dadosAtualizacao.nomeCompleto;
+        }
+
+        if (dadosAtualizacao.telefone !== undefined) {
+            dadosPermitidos.telefone = dadosAtualizacao.telefone;
+        }
+
+        if (dadosAtualizacao.tipoUtilizador) {
+            const tiposPermitidos = ['proprietario', 'arrendatario', 'administrador'];
+            if (!tiposPermitidos.includes(dadosAtualizacao.tipoUtilizador)) {
+                throw new Error('Tipo de utilizador inválido');
+            }
+            dadosPermitidos.tipoUtilizador = dadosAtualizacao.tipoUtilizador;
+        }
+
+        if (Object.keys(dadosPermitidos).length === 0) {
+            throw new Error('Nenhum dado válido para atualizar');
+        }
+
+        const utilizadorAtualizado = await UtilizadorRepositorio.atualizarAdmin(utilizadorId, dadosPermitidos);
+        return utilizadorAtualizado.paraSemSenha();
+    }
+
+    /**
+     * Reativar utilizador (admin)
+     */
+    async reativar(utilizadorId) {
+        await UtilizadorRepositorio.reativar(utilizadorId);
     }
 }
 

@@ -1,0 +1,466 @@
+<div class="container-fluid my-4">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-graph-up me-2"></i>
+      Relatórios e Estatísticas
+    </h2>
+    <p class="text-muted mb-0">Análise completa do sistema</p>
+  </div>
+
+  <!-- Navegação por Abas -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a 
+        class="nav-link" 
+        [class.active]="abaAtiva === 'geral'"
+        (click)="mudarAba('geral')"
+        style="cursor: pointer;">
+        <i class="bi bi-speedometer2 me-1"></i>
+        Visão Geral
+      </a>
+    </li>
+    <li class="nav-item">
+      <a 
+        class="nav-link" 
+        [class.active]="abaAtiva === 'imoveis'"
+        (click)="mudarAba('imoveis')"
+        style="cursor: pointer;">
+        <i class="bi bi-house-door me-1"></i>
+        Imóveis
+      </a>
+    </li>
+    <li class="nav-item">
+      <a 
+        class="nav-link" 
+        [class.active]="abaAtiva === 'utilizadores'"
+        (click)="mudarAba('utilizadores')"
+        style="cursor: pointer;">
+        <i class="bi bi-people me-1"></i>
+        Utilizadores
+      </a>
+    </li>
+    <li class="nav-item">
+      <a 
+        class="nav-link" 
+        [class.active]="abaAtiva === 'financeiro'"
+        (click)="mudarAba('financeiro')"
+        style="cursor: pointer;">
+        <i class="bi bi-currency-dollar me-1"></i>
+        Financeiro
+      </a>
+    </li>
+  </ul>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">A carregar...</span>
+    </div>
+    <p class="mt-2 text-muted">A carregar dados...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="alert alert-danger" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+  </div>
+
+  <!-- ========== ABA: VISÃO GERAL ========== -->
+  <div *ngIf="abaAtiva === 'geral' && !carregando && estatisticasGerais">
+    <div class="row g-4">
+      <!-- Card Imóveis -->
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-house-door me-2"></i>
+              Imóveis
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-6 mb-3">
+                <h2 class="text-primary mb-0">{{ estatisticasGerais.imoveis.total }}</h2>
+                <small class="text-muted">Total</small>
+              </div>
+              <div class="col-6 mb-3">
+                <h2 class="text-success mb-0">{{ estatisticasGerais.imoveis.disponiveis }}</h2>
+                <small class="text-muted">Disponíveis</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-danger mb-0">{{ estatisticasGerais.imoveis.arrendados }}</h2>
+                <small class="text-muted">Arrendados</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-warning mb-0">{{ estatisticasGerais.imoveis.em_analise }}</h2>
+                <small class="text-muted">Em Análise</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Utilizadores -->
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-people me-2"></i>
+              Utilizadores
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-6 mb-3">
+                <h2 class="text-primary mb-0">{{ estatisticasGerais.utilizadores.total }}</h2>
+                <small class="text-muted">Total</small>
+              </div>
+              <div class="col-6 mb-3">
+                <h2 class="text-info mb-0">{{ estatisticasGerais.utilizadores.proprietarios }}</h2>
+                <small class="text-muted">Proprietários</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-success mb-0">{{ estatisticasGerais.utilizadores.arrendatarios }}</h2>
+                <small class="text-muted">Arrendatários</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-danger mb-0">{{ estatisticasGerais.utilizadores.administradores }}</h2>
+                <small class="text-muted">Administradores</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Solicitações -->
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+              <i class="bi bi-clipboard-check me-2"></i>
+              Solicitações
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-6 mb-3">
+                <h2 class="text-primary mb-0">{{ estatisticasGerais.solicitacoes.total }}</h2>
+                <small class="text-muted">Total</small>
+              </div>
+              <div class="col-6 mb-3">
+                <h2 class="text-warning mb-0">{{ estatisticasGerais.solicitacoes.pendentes }}</h2>
+                <small class="text-muted">Pendentes</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-success mb-0">{{ estatisticasGerais.solicitacoes.aceites }}</h2>
+                <small class="text-muted">Aceites</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-danger mb-0">{{ estatisticasGerais.solicitacoes.recusadas }}</h2>
+                <small class="text-muted">Recusadas</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Mensagens -->
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-envelope me-2"></i>
+              Mensagens
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center align-items-center h-100">
+              <div class="col-6">
+                <h2 class="text-primary mb-0">{{ estatisticasGerais.mensagens.total }}</h2>
+                <small class="text-muted">Total</small>
+              </div>
+              <div class="col-6">
+                <h2 class="text-warning mb-0">{{ estatisticasGerais.mensagens.nao_lidas }}</h2>
+                <small class="text-muted">Não Lidas</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ABA: IMÓVEIS ========== -->
+  <div *ngIf="abaAtiva === 'imoveis' && !carregando && relatorioImoveis">
+    <!-- Por Tipologia -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Imóveis por Tipologia</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Tipologia</th>
+                <th class="text-end">Total</th>
+                <th class="text-end">Preço Médio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioImoveis.porTipologia">
+                <td><strong>{{ item.tipologia }}</strong></td>
+                <td class="text-end">{{ item.total }}</td>
+                <td class="text-end">{{ formatarMoeda(item.preco_medio) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Por Província -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Imóveis por Província</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Província</th>
+                <th class="text-end">Total</th>
+                <th class="text-end">Preço Médio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioImoveis.porProvincia">
+                <td><strong>{{ item.provincia }}</strong></td>
+                <td class="text-end">{{ item.total }}</td>
+                <td class="text-end">{{ formatarMoeda(item.preco_medio) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mais Visualizados -->
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h5 class="mb-0">Imóveis Mais Visualizados</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Condomínio</th>
+                <th class="text-end">Preço</th>
+                <th class="text-end">Visualizações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioImoveis.maisVisualizados">
+                <td><strong>{{ item.titulo }}</strong></td>
+                <td>{{ item.condominio }}</td>
+                <td class="text-end">{{ formatarMoeda(item.preco_mensal) }}</td>
+                <td class="text-end">
+                  <span class="badge bg-primary">{{ item.total_visualizacoes }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ABA: UTILIZADORES ========== -->
+  <div *ngIf="abaAtiva === 'utilizadores' && !carregando && relatorioUtilizadores">
+    <!-- Crescimento Mensal -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Novos Utilizadores (Últimos 12 Meses)</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Mês</th>
+                <th class="text-end">Total</th>
+                <th class="text-end">Proprietários</th>
+                <th class="text-end">Arrendatários</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioUtilizadores.novosPorMes">
+                <td><strong>{{ formatarMes(item.mes) }}</strong></td>
+                <td class="text-end">{{ item.total }}</td>
+                <td class="text-end">{{ item.proprietarios }}</td>
+                <td class="text-end">{{ item.arrendatarios }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Proprietários Mais Ativos -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Proprietários Mais Ativos</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th class="text-end">Total Imóveis</th>
+                <th class="text-end">Disponíveis</th>
+                <th class="text-end">Arrendados</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioUtilizadores.proprietariosAtivos">
+                <td><strong>{{ item.nome_completo }}</strong></td>
+                <td>{{ item.email }}</td>
+                <td class="text-end">
+                  <span class="badge bg-primary">{{ item.total_imoveis }}</span>
+                </td>
+                <td class="text-end">{{ item.disponiveis }}</td>
+                <td class="text-end">{{ item.arrendados }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taxa de Atividade -->
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h5 class="mb-0">Taxa de Atividade</h5>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-md-4">
+            <h2 class="text-primary mb-0">{{ relatorioUtilizadores.taxaAtividade.total }}</h2>
+            <small class="text-muted">Total de Utilizadores</small>
+          </div>
+          <div class="col-md-4">
+            <h2 class="text-success mb-0">{{ relatorioUtilizadores.taxaAtividade.ativos }}</h2>
+            <small class="text-muted">Ativos ({{ calcularPercentagem(relatorioUtilizadores.taxaAtividade.ativos, relatorioUtilizadores.taxaAtividade.total) }}%)</small>
+          </div>
+          <div class="col-md-4">
+            <h2 class="text-danger mb-0">{{ relatorioUtilizadores.taxaAtividade.inativos }}</h2>
+            <small class="text-muted">Inativos ({{ calcularPercentagem(relatorioUtilizadores.taxaAtividade.inativos, relatorioUtilizadores.taxaAtividade.total) }}%)</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ABA: FINANCEIRO ========== -->
+  <div *ngIf="abaAtiva === 'financeiro' && !carregando && relatorioFinanceiro">
+    <!-- Resumo Financeiro -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="card shadow-sm bg-success text-white">
+          <div class="card-body text-center">
+            <h6 class="mb-2">Receita Mensal Estimada</h6>
+            <h2 class="mb-0">{{ formatarMoeda(relatorioFinanceiro.receitaEstimada.receita_mensal_estimada || 0) }}</h2>
+            <small>De {{ relatorioFinanceiro.receitaEstimada.total_arrendados }} imóveis arrendados</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-sm bg-primary text-white">
+          <div class="card-body text-center">
+            <h6 class="mb-2">Valor Médio de Arrendamento</h6>
+            <h2 class="mb-0">{{ formatarMoeda(relatorioFinanceiro.receitaEstimada.valor_medio_arrendamento || 0) }}</h2>
+            <small>Por imóvel</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card shadow-sm bg-info text-white">
+          <div class="card-body text-center">
+            <h6 class="mb-2">Potencial de Receita</h6>
+            <h2 class="mb-0">{{ formatarMoeda(relatorioFinanceiro.potencialReceita.potencial_mensal || 0) }}</h2>
+            <small>De {{ relatorioFinanceiro.potencialReceita.total_disponiveis }} imóveis disponíveis</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Receita por Província -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Receita por Província</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Província</th>
+                <th class="text-end">Imóveis Arrendados</th>
+                <th class="text-end">Receita Mensal</th>
+                <th class="text-end">Valor Médio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioFinanceiro.receitaPorProvincia">
+                <td><strong>{{ item.provincia }}</strong></td>
+                <td class="text-end">{{ item.total_arrendados }}</td>
+                <td class="text-end text-success fw-bold">{{ formatarMoeda(item.receita_mensal) }}</td>
+                <td class="text-end">{{ formatarMoeda(item.valor_medio) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 10 Condomínios -->
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h5 class="mb-0">Top 10 Condomínios com Maior Receita</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Condomínio</th>
+                <th>Localização</th>
+                <th class="text-end">Imóveis Arrendados</th>
+                <th class="text-end">Receita Mensal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of relatorioFinanceiro.receitaPorCondominio; let i = index">
+                <td>
+                  <span class="badge bg-secondary me-2">#{{ i + 1 }}</span>
+                  <strong>{{ item.nome }}</strong>
+                </td>
+                <td>{{ item.municipio }}, {{ item.provincia }}</td>
+                <td class="text-end">{{ item.total_arrendados }}</td>
+                <td class="text-end text-success fw-bold">{{ formatarMoeda(item.receita_mensal) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

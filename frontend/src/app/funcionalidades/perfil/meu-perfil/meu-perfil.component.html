@@ -1,0 +1,209 @@
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-person-circle me-2"></i>
+      Meu Perfil
+    </h2>
+    <p class="text-muted mb-0">Gerencie suas informações pessoais</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">A carregar...</span>
+    </div>
+    <p class="mt-2 text-muted">A carregar perfil...</p>
+  </div>
+
+  <!-- Mensagens -->
+  <div class="alert alert-success alert-dismissible fade show" *ngIf="sucesso">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ sucesso }}
+    <button type="button" class="btn-close" (click)="sucesso = null"></button>
+  </div>
+
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+    <button type="button" class="btn-close" (click)="erro = null"></button>
+  </div>
+
+  <!-- Perfil -->
+  <div class="row g-4" *ngIf="!carregando && utilizador">
+    <!-- Card de Foto e Info Básica -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+          <!-- Foto de Perfil -->
+          <div class="position-relative d-inline-block mb-3">
+            <div class="avatar-large mx-auto" 
+                 [style.background-image]="utilizador.fotoPerfil ? 'url(' + obterUrlFotoPerfil() + ')' : 'none'"
+                 [style.background-color]="!utilizador.fotoPerfil ? '#0d6efd' : 'transparent'">
+              <span class="avatar-initials" *ngIf="!utilizador.fotoPerfil">
+                {{ obterIniciais() }}
+              </span>
+            </div>
+            
+            <!-- Botão de Upload -->
+            <label class="btn btn-sm btn-primary rounded-circle upload-btn" 
+                   [class.disabled]="uploadandoFoto">
+              <i class="bi bi-camera-fill" *ngIf="!uploadandoFoto"></i>
+              <span class="spinner-border spinner-border-sm" *ngIf="uploadandoFoto"></span>
+              <input 
+                type="file" 
+                class="d-none" 
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                (change)="onFotoSelecionada($event)"
+                [disabled]="uploadandoFoto">
+            </label>
+          </div>
+
+          <h4 class="mb-1">{{ utilizador.nomeCompleto }}</h4>
+          <p class="text-muted mb-2">{{ utilizador.email }}</p>
+          
+          <span class="badge" [class]="'bg-' + obterCorTipo()">
+            {{ obterTipoUtilizadorTexto() }}
+          </span>
+
+          <hr class="my-3">
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" (click)="abrirModalSenha()">
+              <i class="bi bi-key me-2"></i>
+              Alterar Senha
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card de Informações -->
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Informações Pessoais</h5>
+          
+          <button 
+            class="btn btn-sm btn-primary" 
+            *ngIf="!editando"
+            (click)="ativarEdicao()">
+            <i class="bi bi-pencil me-1"></i>
+            Editar
+          </button>
+        </div>
+
+        <div class="card-body">
+          <!-- Modo Visualização -->
+          <div *ngIf="!editando">
+            <div class="row mb-3">
+              <div class="col-sm-4">
+                <strong>Nome Completo:</strong>
+              </div>
+              <div class="col-sm-8">
+                {{ utilizador.nomeCompleto }}
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-4">
+                <strong>Email:</strong>
+              </div>
+              <div class="col-sm-8">
+                {{ utilizador.email }}
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-4">
+                <strong>Telefone:</strong>
+              </div>
+              <div class="col-sm-8">
+                {{ utilizador.telefone || 'Não informado' }}
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-sm-4">
+                <strong>Tipo de Conta:</strong>
+              </div>
+              <div class="col-sm-8">
+                {{ obterTipoUtilizadorTexto() }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-4">
+                <strong>Membro desde:</strong>
+              </div>
+              <div class="col-sm-8">
+                {{ utilizador.dataCriacao | date:'dd/MM/yyyy' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Modo Edição -->
+          <form *ngIf="editando" (ngSubmit)="salvarPerfil()">
+            <div class="mb-3">
+              <label class="form-label">Nome Completo *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                [(ngModel)]="dadosEdicao.nomeCompleto"
+                name="nomeCompleto"
+                required
+                [disabled]="salvando">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                [value]="utilizador.email"
+                disabled>
+              <small class="text-muted">O email não pode ser alterado</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Telefone</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                [(ngModel)]="dadosEdicao.telefone"
+                name="telefone"
+                placeholder="Ex: +244 923 456 789"
+                [disabled]="salvando">
+            </div>
+
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="salvando || !dadosEdicao.nomeCompleto.trim()">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="salvando"></span>
+                <i class="bi bi-check-lg me-1" *ngIf="!salvando"></i>
+                Salvar
+              </button>
+              
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary"
+                (click)="cancelarEdicao()"
+                [disabled]="salvando">
+                <i class="bi bi-x-lg me-1"></i>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Alterar Senha -->
+<app-alterar-senha 
+  *ngIf="mostrarModalSenha"
+  (fechar)="fecharModalSenha()">
+</app-alterar-senha>

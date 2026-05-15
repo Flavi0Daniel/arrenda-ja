@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SolicitacaoService } from '../../../servicos/solicitacao.service';
+import { EstatisticaService } from '../../../servicos/estatistica.service';
 import { AutenticacaoService } from '../../../servicos/autenticacao.service';
 import { Solicitacao } from '../../../modelos/solicitacao.model';
 
@@ -25,6 +26,7 @@ export class PainelArrendatarioComponent implements OnInit {
 
   constructor(
     private solicitacaoService: SolicitacaoService,
+    private estatisticaService: EstatisticaService,
     public autenticacaoService: AutenticacaoService,
     private router: Router
   ) {}
@@ -38,19 +40,30 @@ export class PainelArrendatarioComponent implements OnInit {
 
   carregarDados(): void {
     this.carregando = true;
+    
+    const utilizador = this.autenticacaoService.obterUtilizadorAtual();
+    if (!utilizador) return;
 
+    // Carregar estatísticas
+    this.estatisticaService.obterEstatisticasArrendatario(utilizador.id).subscribe({
+      next: (resposta) => {
+        if (resposta.sucesso && resposta.dados) {
+          const dados = resposta.dados;
+          
+          this.totalSolicitacoes = dados.solicitacoes.total;
+          this.solicitacoesPendentes = dados.solicitacoes.pendentes;
+          this.solicitacoesAceites = dados.solicitacoes.aceites;
+          this.solicitacoesRecusadas = dados.solicitacoes.recusadas;
+        }
+      },
+      error: (erro) => console.error('Erro ao carregar estatísticas:', erro)
+    });
+
+    // Carregar últimas solicitações
     this.solicitacaoService.listarEnviadas().subscribe({
       next: (resposta) => {
         if (resposta.sucesso && resposta.dados) {
-          const solicitacoes = resposta.dados;
-          
-          this.totalSolicitacoes = solicitacoes.length;
-          this.solicitacoesPendentes = solicitacoes.filter(s => s.status === 'pendente').length;
-          this.solicitacoesAceites = solicitacoes.filter(s => s.status === 'aceite').length;
-          this.solicitacoesRecusadas = solicitacoes.filter(s => s.status === 'recusada').length;
-          
-          // Últimas 5 solicitações
-          this.ultimasSolicitacoes = solicitacoes.slice(0, 5);
+          this.ultimasSolicitacoes = resposta.dados.slice(0, 5);
         }
         this.carregando = false;
       },

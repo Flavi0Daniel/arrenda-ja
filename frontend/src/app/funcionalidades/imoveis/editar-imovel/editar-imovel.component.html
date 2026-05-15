@@ -1,1 +1,339 @@
-<p>editar-imovel works!</p>
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <button class="btn btn-outline-secondary mb-3" (click)="voltar()">
+      <i class="bi bi-arrow-left me-2"></i>
+      Voltar
+    </button>
+
+    <h2 class="fw-bold">
+      <i class="bi bi-pencil-square me-2"></i>
+      Editar Imóvel
+    </h2>
+    <p class="text-muted mb-0">Atualize as informações do seu imóvel</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">A carregar...</span>
+    </div>
+    <p class="mt-2 text-muted">A carregar imóvel...</p>
+  </div>
+
+  <!-- Mensagens -->
+  <div class="alert alert-success alert-dismissible fade show" *ngIf="sucesso">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ sucesso }}
+    <button type="button" class="btn-close" (click)="sucesso = null"></button>
+  </div>
+
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+    <button type="button" class="btn-close" (click)="erro = null"></button>
+  </div>
+
+  <!-- Conteúdo -->
+  <div *ngIf="!carregando && imovel">
+    <div class="row g-4">
+      <!-- Coluna Esquerda: Formulário -->
+      <div class="col-lg-8">
+        <!-- Card de Informações Básicas -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">Informações Básicas</h5>
+          </div>
+          <div class="card-body">
+            <form (ngSubmit)="salvarAlteracoes()">
+              <!-- Título -->
+              <div class="mb-3">
+                <label class="form-label">Título *</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="dadosEdicao.titulo"
+                  name="titulo"
+                  required
+                  [disabled]="salvando"
+                  placeholder="Ex: Apartamento T2 no Talatona">
+              </div>
+
+              <!-- Descrição -->
+              <div class="mb-3">
+                <label class="form-label">Descrição *</label>
+                <textarea 
+                  class="form-control" 
+                  rows="4"
+                  [(ngModel)]="dadosEdicao.descricao"
+                  name="descricao"
+                  required
+                  [disabled]="salvando"
+                  placeholder="Descreva o imóvel em detalhes..."></textarea>
+              </div>
+
+              <!-- Tipologia e Preço -->
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Tipologia *</label>
+                  <select 
+                    class="form-select" 
+                    [(ngModel)]="dadosEdicao.tipologia"
+                    name="tipologia"
+                    [disabled]="salvando">
+                    <option *ngFor="let tipo of tipologias" [value]="tipo">
+                      {{ tipo }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Preço Mensal (Kz) *</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    [(ngModel)]="dadosEdicao.precoMensal"
+                    name="precoMensal"
+                    required
+                    min="0"
+                    [disabled]="salvando"
+                    placeholder="Ex: 150000">
+                </div>
+              </div>
+
+              <!-- Características -->
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Área (m²)</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    [(ngModel)]="dadosEdicao.areaMetrosQuadrados"
+                    name="area"
+                    min="0"
+                    [disabled]="salvando"
+                    placeholder="Ex: 85">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Quartos</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    [(ngModel)]="dadosEdicao.numeroQuartos"
+                    name="quartos"
+                    min="0"
+                    [disabled]="salvando"
+                    placeholder="Ex: 2">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label class="form-label">Casas de Banho</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    [(ngModel)]="dadosEdicao.numeroCasasBanho"
+                    name="casasBanho"
+                    min="0"
+                    [disabled]="salvando"
+                    placeholder="Ex: 2">
+                </div>
+              </div>
+
+              <!-- Comodidades -->
+              <div class="mb-3">
+                <label class="form-label d-block mb-2">Comodidades</label>
+                
+                <div class="form-check form-check-inline">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="garagem"
+                    [(ngModel)]="dadosEdicao.temGaragem"
+                    name="garagem"
+                    [disabled]="salvando">
+                  <label class="form-check-label" for="garagem">
+                    <i class="bi bi-car-front me-1"></i>
+                    Garagem
+                  </label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="piscina"
+                    [(ngModel)]="dadosEdicao.temPiscina"
+                    name="piscina"
+                    [disabled]="salvando">
+                  <label class="form-check-label" for="piscina">
+                    <i class="bi bi-water me-1"></i>
+                    Piscina
+                  </label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    id="mobilado"
+                    [(ngModel)]="dadosEdicao.estaMobilado"
+                    name="mobilado"
+                    [disabled]="salvando">
+                  <label class="form-check-label" for="mobilado">
+                    <i class="bi bi-house-check me-1"></i>
+                    Mobilado
+                  </label>
+                </div>
+              </div>
+
+              <!-- Botão Salvar -->
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="salvando">
+                <span class="spinner-border spinner-border-sm me-2" *ngIf="salvando"></span>
+                <i class="bi bi-save me-1" *ngIf="!salvando"></i>
+                Salvar Alterações
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Card de Fotos -->
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Fotos do Imóvel</h5>
+            
+            <label class="btn btn-sm btn-primary mb-0" [class.disabled]="uploadandoFotos">
+              <i class="bi bi-cloud-upload me-1" *ngIf="!uploadandoFotos"></i>
+              <span class="spinner-border spinner-border-sm me-1" *ngIf="uploadandoFotos"></span>
+              Adicionar Fotos
+              <input 
+                type="file" 
+                class="d-none" 
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                multiple
+                (change)="onFotosSelecionadas($event)"
+                [disabled]="uploadandoFotos">
+            </label>
+          </div>
+          <div class="card-body">
+            <div class="row g-3" *ngIf="imovel.fotos && imovel.fotos.length > 0">
+              <div class="col-md-4 col-sm-6" *ngFor="let foto of imovel.fotos">
+                <div class="position-relative foto-container">
+                  <img 
+                    [src]="obterUrlFoto(foto.caminhoArquivo)" 
+                    [alt]="'Foto do imóvel'"
+                    class="img-fluid rounded">
+                  
+                  <span class="badge bg-primary position-absolute top-0 start-0 m-2" *ngIf="foto.ePrincipal">
+                    Principal
+                  </span>
+
+                  <button 
+                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2"
+                    (click)="removerFoto(foto.id)"
+                    title="Remover foto">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center py-4 text-muted" *ngIf="!imovel.fotos || imovel.fotos.length === 0">
+              <i class="bi bi-image fs-1"></i>
+              <p class="mt-2">Nenhuma foto adicionada ainda</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Direita: Status e Ações -->
+      <div class="col-lg-4">
+        <!-- Card de Status -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">Status do Imóvel</h5>
+          </div>
+          <div class="card-body">
+            <div class="text-center mb-3">
+              <span class="badge fs-5" [class]="'bg-' + obterCorStatus()">
+                {{ obterTextoStatus() }}
+              </span>
+            </div>
+
+            <p class="text-muted small mb-3">
+              Gerencie o status do seu imóvel de acordo com sua situação atual.
+            </p>
+
+            <!-- Ações de Status -->
+            <div class="d-grid gap-2">
+              <!-- Marcar como Arrendado -->
+              <button 
+                class="btn btn-danger btn-sm"
+                *ngIf="imovel.status === 'disponivel'"
+                (click)="marcarComoArrendado()"
+                [disabled]="processandoStatus">
+                <i class="bi bi-lock me-1"></i>
+                Marcar como Arrendado
+              </button>
+
+              <!-- Marcar como Disponível -->
+              <button 
+                class="btn btn-success btn-sm"
+                *ngIf="imovel.status === 'arrendado'"
+                (click)="marcarComoDisponivel()"
+                [disabled]="processandoStatus">
+                <i class="bi bi-unlock me-1"></i>
+                Marcar como Disponível
+              </button>
+
+              <!-- Desativar Imóvel -->
+              <button 
+                class="btn btn-outline-secondary btn-sm"
+                *ngIf="imovel.status !== 'inativo'"
+                (click)="marcarComoInativo()"
+                [disabled]="processandoStatus">
+                <i class="bi bi-x-circle me-1"></i>
+                Desativar Imóvel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card de Informações -->
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">Informações</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-2">
+              <small class="text-muted">Condomínio:</small>
+              <p class="mb-0" *ngIf="imovel.condominio">
+                {{ imovel.condominio.nome }}
+              </p>
+            </div>
+
+            <div class="mb-2">
+              <small class="text-muted">Localização:</small>
+              <p class="mb-0" *ngIf="imovel.condominio">
+                {{ imovel.condominio.bairro }}, {{ imovel.condominio.municipio }}
+              </p>
+            </div>
+
+            <div class="mb-2">
+              <small class="text-muted">Publicado em:</small>
+              <p class="mb-0">{{ imovel.dataCriacao | date:'dd/MM/yyyy' }}</p>
+            </div>
+
+            <div *ngIf="imovel.totalVisualizacoes">
+              <small class="text-muted">Visualizações:</small>
+              <p class="mb-0">{{ imovel.totalVisualizacoes }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

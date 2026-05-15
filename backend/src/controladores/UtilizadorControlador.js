@@ -4,6 +4,40 @@ const UtilizadorServico = require('../servicos/UtilizadorServico');
  * Controlador para gestão de utilizadores
  */
 class UtilizadorControlador {
+
+    /**
+     * POST /api/utilizadores/perfil/foto
+     * Upload de foto de perfil
+     */
+    async uploadFotoPerfil(req, res) {
+        try {
+            if (!req.file) {
+                return res.status(400).json({
+                    sucesso: false,
+                    mensagem: 'Nenhuma foto foi enviada'
+                });
+            }
+
+            const utilizadorId = req.utilizador.id;
+            const caminhoFoto = req.file.path;
+
+            await UtilizadorServico.atualizarPerfil(utilizadorId, {
+                fotoPerfil: caminhoFoto
+            });
+
+            res.json({
+                sucesso: true,
+                mensagem: 'Foto atualizada com sucesso',
+                dados: { caminhoFoto }
+            });
+        } catch (erro) {
+            res.status(400).json({
+                sucesso: false,
+                mensagem: erro.message
+            });
+        }
+    }
+
     /**
      * GET /api/utilizadores/perfil
      * Obter perfil do utilizador autenticado
@@ -101,6 +135,52 @@ class UtilizadorControlador {
     }
 
     /**
+ * POST /api/utilizadores
+ * Criar novo utilizador (admin)
+ */
+async criar(req, res) {
+    try {
+        const novoUtilizador = await UtilizadorServico.criar(req.body);
+        
+        res.status(201).json({
+            sucesso: true,
+            mensagem: 'Utilizador criado com sucesso',
+            dados: novoUtilizador
+        });
+    } catch (erro) {
+        res.status(400).json({
+            sucesso: false,
+            mensagem: erro.message
+        });
+    }
+}
+
+/**
+ * PUT /api/utilizadores/:id
+ * Editar utilizador (admin)
+ */
+async editar(req, res) {
+    try {
+        const utilizadorId = parseInt(req.params.id);
+        const utilizadorAtualizado = await UtilizadorServico.editar(utilizadorId, req.body);
+        
+        res.json({
+            sucesso: true,
+            mensagem: 'Utilizador atualizado com sucesso',
+            dados: utilizadorAtualizado
+        });
+    } catch (erro) {
+        res.status(400).json({
+            sucesso: false,
+            mensagem: erro.message
+        });
+    }
+}
+
+    
+
+
+    /**
      * DELETE /api/utilizadores/:id
      * Desativar utilizador (admin)
      */
@@ -121,6 +201,28 @@ class UtilizadorControlador {
             });
         }
     }
+
+    /**
+     * PATCH /api/utilizadores/:id/reativar
+     * Reativar utilizador
+     */
+    async reativar(req, res) {
+        try {
+            const utilizadorId = parseInt(req.params.id);
+            await UtilizadorServico.reativar(utilizadorId);
+            
+            res.json({
+                sucesso: true,
+                mensagem: 'Utilizador reativado com sucesso'
+            });
+        } catch (erro) {
+            res.status(400).json({
+                sucesso: false,
+                mensagem: erro.message
+            });
+        }
+    }
+
 }
 
 module.exports = new UtilizadorControlador();

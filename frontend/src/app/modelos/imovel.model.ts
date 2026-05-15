@@ -32,6 +32,7 @@ export interface Imovel {
   };
   fotos?: FotoImovel[];
   fotoPrincipal?: string;
+  foto_principal?: string;
   totalVisualizacoes?: number;
 }
 

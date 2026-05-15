@@ -45,13 +45,44 @@ const configuracaoUpload = multer({
 /**
  * Middleware para upload de múltiplas fotos de imóveis
  * Permite até 10 fotos por vez
+ * CORRIGIDO: Adiciona o caminho relativo ao req.files
  */
-const uploadFotosImoveis = configuracaoUpload.array('fotos', 10);
+const uploadFotosImoveis = (req, res, next) => {
+    configuracaoUpload.array('fotos', 10)(req, res, (erro) => {
+        if (erro) {
+            return next(erro);
+        }
+        
+        // Corrigir os caminhos dos arquivos para usar caminhos relativos
+        if (req.files && req.files.length > 0) {
+            req.files = req.files.map(file => ({
+                ...file,
+                // Substituir o caminho absoluto pelo relativo
+                path: `uploads/imoveis/${file.filename}`
+            }));
+        }
+        
+        next();
+    });
+};
 
 /**
  * Middleware para upload de foto de perfil
  */
-const uploadFotoPerfil = configuracaoUpload.single('fotoPerfil');
+const uploadFotoPerfil = (req, res, next) => {
+    configuracaoUpload.single('fotoPerfil')(req, res, (erro) => {
+        if (erro) {
+            return next(erro);
+        }
+        
+        // Corrigir o caminho do arquivo para usar caminho relativo
+        if (req.file) {
+            req.file.path = `uploads/perfis/${req.file.filename}`;
+        }
+        
+        next();
+    });
+};
 
 module.exports = {
     uploadFotosImoveis,

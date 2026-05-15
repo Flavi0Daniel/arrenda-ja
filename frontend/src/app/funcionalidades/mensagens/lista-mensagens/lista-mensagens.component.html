@@ -1,0 +1,136 @@
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-envelope me-2"></i>
+      Mensagens
+    </h2>
+    <p class="text-muted mb-0">Gerencie suas conversas</p>
+  </div>
+
+  <!-- Abas e Filtros -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <!-- Abas -->
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <a 
+              class="nav-link" 
+              [class.active]="abaAtiva === 'recebidas'"
+              (click)="mudarAba('recebidas')"
+              style="cursor: pointer;">
+              <i class="bi bi-inbox me-1"></i>
+              Recebidas
+            </a>
+          </li>
+          <li class="nav-item">
+            <a 
+              class="nav-link" 
+              [class.active]="abaAtiva === 'enviadas'"
+              (click)="mudarAba('enviadas')"
+              style="cursor: pointer;">
+              <i class="bi bi-send me-1"></i>
+              Enviadas
+            </a>
+          </li>
+        </ul>
+
+        <!-- Filtro Não Lidas (apenas em Recebidas) -->
+        <div *ngIf="abaAtiva === 'recebidas'">
+          <div class="form-check form-switch">
+            <input 
+              class="form-check-input" 
+              type="checkbox" 
+              id="filtroNaoLidas"
+              [(ngModel)]="apenasNaoLidas"
+              (change)="filtrarNaoLidas()">
+            <label class="form-check-label" for="filtroNaoLidas">
+              Apenas não lidas
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">A carregar...</span>
+    </div>
+    <p class="mt-2 text-muted">A carregar mensagens...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="alert alert-danger" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+  </div>
+
+  <!-- Lista de Mensagens -->
+  <div *ngIf="!carregando && !erro">
+    <!-- Nenhuma mensagem -->
+    <div class="text-center py-5" *ngIf="mensagens.length === 0">
+      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <h4 class="mt-3 text-muted">Nenhuma mensagem encontrada</h4>
+      <p class="text-muted">
+        {{ abaAtiva === 'recebidas' ? 'Você ainda não recebeu mensagens.' : 'Você ainda não enviou mensagens.' }}
+      </p>
+    </div>
+
+    <!-- Cards de Mensagens -->
+    <div class="list-group" *ngIf="mensagens.length > 0">
+      <a 
+        *ngFor="let mensagem of mensagens"
+        class="list-group-item list-group-item-action"
+        [class.list-group-item-light]="!mensagem.foiLida && abaAtiva === 'recebidas'"
+        (click)="abrirConversa(mensagem)"
+        style="cursor: pointer;">
+        
+        <div class="d-flex align-items-start">
+          <!-- Avatar -->
+          <div class="flex-shrink-0 me-3">
+            <div class="avatar-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                 style="width: 50px; height: 50px; border-radius: 50%;">
+              <span class="fw-bold">
+                {{ obterIniciais((abaAtiva === 'recebidas' ? mensagem.remetenteNome : mensagem.destinatarioNome) || 'Utilizador') }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Conteúdo -->
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <div>
+                <h6 class="mb-0 fw-bold">
+                  {{ abaAtiva === 'recebidas' ? mensagem.remetenteNome : mensagem.destinatarioNome }}
+                  <span class="badge bg-primary ms-2" *ngIf="!mensagem.foiLida && abaAtiva === 'recebidas'">
+                    Nova
+                  </span>
+                </h6>
+                <small class="text-muted" *ngIf="mensagem.imovelTitulo">
+                  <i class="bi bi-house me-1"></i>
+                  {{ mensagem.imovelTitulo }}
+                </small>
+              </div>
+              <small class="text-muted">
+                {{ obterTempoDecorrido(mensagem.dataEnvio) }}
+              </small>
+            </div>
+
+            <p class="mb-0 text-truncate" style="max-width: 600px;">
+              <strong *ngIf="mensagem.assunto">{{ mensagem.assunto }}: </strong>
+              {{ mensagem.conteudo }}
+            </p>
+          </div>
+
+          <!-- Ícone -->
+          <div class="flex-shrink-0 ms-2">
+            <i class="bi bi-chevron-right text-muted"></i>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

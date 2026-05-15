@@ -1,0 +1,266 @@
+<div class="container-fluid my-4">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="fw-bold mb-1">
+          <i class="bi bi-people me-2"></i>
+          Gestão de Utilizadores
+        </h2>
+        <p class="text-muted mb-0">Gerencie todos os utilizadores do sistema</p>
+      </div>
+      
+      <button class="btn btn-primary" (click)="abrirModalCriar()">
+        <i class="bi bi-plus-circle me-2"></i>
+        Novo Utilizador
+      </button>
+    </div>
+  </div>
+
+  <!-- Estatísticas -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-people-fill"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1">Total</h6>
+              <h3 class="mb-0">{{ estatisticas.total }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="stat-icon bg-info bg-opacity-10 text-info">
+                <i class="bi bi-house-door"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1">Proprietários</h6>
+              <h3 class="mb-0">{{ estatisticas.proprietarios }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="stat-icon bg-success bg-opacity-10 text-success">
+                <i class="bi bi-person-check"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1">Arrendatários</h6>
+              <h3 class="mb-0">{{ estatisticas.arrendatarios }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                <i class="bi bi-shield-check"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="text-muted mb-1">Administradores</h6>
+              <h3 class="mb-0">{{ estatisticas.administradores }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensagens -->
+  <div class="alert alert-success alert-dismissible fade show" *ngIf="sucesso">
+    <i class="bi bi-check-circle me-2"></i>
+    {{ sucesso }}
+    <button type="button" class="btn-close" (click)="sucesso = null"></button>
+  </div>
+
+  <div class="alert alert-danger alert-dismissible fade show" *ngIf="erro">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ erro }}
+    <button type="button" class="btn-close" (click)="erro = null"></button>
+  </div>
+
+  <!-- Filtros e Busca -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Busca -->
+        <div class="col-md-4">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Buscar por nome ou email..."
+            [(ngModel)]="termoBusca"
+            (input)="aplicarFiltros()">
+        </div>
+
+        <!-- Filtro Tipo -->
+        <div class="col-md-4">
+          <select 
+            class="form-select"
+            [(ngModel)]="filtroTipo"
+            (change)="aplicarFiltros()">
+            <option value="todos">Todos os tipos</option>
+            <option value="proprietario">Proprietários</option>
+            <option value="arrendatario">Arrendatários</option>
+            <option value="administrador">Administradores</option>
+          </select>
+        </div>
+
+        <!-- Filtro Status -->
+        <div class="col-md-4">
+          <select 
+            class="form-select"
+            [(ngModel)]="filtroStatus"
+            (change)="aplicarFiltros()">
+            <option value="todos">Todos os status</option>
+            <option value="ativos">Apenas ativos</option>
+            <option value="inativos">Apenas inativos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-2">
+        <small class="text-muted">
+          Mostrando {{ utilizadoresFiltrados.length }} de {{ utilizadores.length }} utilizadores
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="text-center py-5" *ngIf="carregando">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">A carregar...</span>
+    </div>
+    <p class="mt-2 text-muted">A carregar utilizadores...</p>
+  </div>
+
+  <!-- Tabela de Utilizadores -->
+  <div class="card shadow-sm" *ngIf="!carregando">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Utilizador</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th>Tipo</th>
+              <th>Status</th>
+              <th>Criado em</th>
+              <th class="text-end">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let utilizador of utilizadoresFiltrados">
+              <!-- Avatar e Nome -->
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                    {{ obterIniciais(utilizador.nomeCompleto) }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ utilizador.nomeCompleto }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Email -->
+              <td>{{ utilizador.email }}</td>
+
+              <!-- Telefone -->
+              <td>{{ utilizador.telefone || '-' }}</td>
+
+              <!-- Tipo -->
+              <td>
+                <span class="badge" [class]="'bg-' + obterCorTipo(utilizador.tipoUtilizador)">
+                  {{ obterTextoTipo(utilizador.tipoUtilizador) }}
+                </span>
+              </td>
+
+              <!-- Status -->
+              <td>
+                <span class="badge" [class]="utilizador.estaAtivo ? 'bg-success' : 'bg-secondary'">
+                  {{ utilizador.estaAtivo ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+
+              <!-- Data Criação -->
+              <td>{{ utilizador.dataCriacao | date:'dd/MM/yyyy' }}</td>
+
+              <!-- Ações -->
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <button 
+                    class="btn btn-outline-primary"
+                    (click)="abrirModalEditar(utilizador)"
+                    title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  
+                  <button 
+                    *ngIf="utilizador.estaAtivo"
+                    class="btn btn-outline-danger"
+                    (click)="desativar(utilizador)"
+                    title="Desativar">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                  
+                  <button 
+                    *ngIf="!utilizador.estaAtivo"
+                    class="btn btn-outline-success"
+                    (click)="reativar(utilizador)"
+                    title="Reativar">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Nenhum resultado -->
+            <tr *ngIf="utilizadoresFiltrados.length === 0">
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                Nenhum utilizador encontrado
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Criar/Editar -->
+<app-criar-utilizador
+  *ngIf="mostrarModalCriar"
+  [utilizador]="utilizadorEdicao"
+  (fechar)="fecharModal()"
+  (salvo)="onUtilizadorSalvo()">
+</app-criar-utilizador>

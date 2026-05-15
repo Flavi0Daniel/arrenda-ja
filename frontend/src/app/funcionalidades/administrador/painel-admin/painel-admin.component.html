@@ -1,1 +1,198 @@
-<p>painel-admin works!</p>
+<div class="container my-5">
+  <!-- Cabeçalho -->
+  <div class="mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-shield-check me-2"></i>
+      Painel do Administrador
+    </h2>
+    <p class="text-muted">Bem-vindo, {{ nomeUtilizador }}!</p>
+  </div>
+
+  <!-- Loading -->
+  <app-carregamento *ngIf="carregando" mensagem="A carregar dados..."></app-carregamento>
+
+  <!-- Dashboard -->
+  <div *ngIf="!carregando">
+    <!-- Cards de Estatísticas -->
+    <div class="row g-4 mb-4">
+      <!-- Total de Imóveis -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Total de Imóveis</p>
+                <h3 class="mb-0 fw-bold">{{ totalImoveis }}</h3>
+              </div>
+              <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-building fs-3 text-primary"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Em Análise -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Em Análise</p>
+                <h3 class="mb-0 fw-bold text-warning">{{ imoveisEmAnalise }}</h3>
+              </div>
+              <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-clock fs-3 text-warning"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disponíveis -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Disponíveis</p>
+                <h3 class="mb-0 fw-bold text-success">{{ imoveisDisponiveis }}</h3>
+              </div>
+              <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-check-circle fs-3 text-success"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrendados -->
+      <div class="col-md-3">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <p class="text-muted mb-1 small">Arrendados</p>
+                <h3 class="mb-0 fw-bold text-info">{{ imoveisArrendados }}</h3>
+              </div>
+              <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                <i class="bi bi-house-check fs-3 text-info"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title mb-3">
+              <i class="bi bi-lightning-charge me-2"></i>
+              Ações de Gestão
+            </h5>
+            <div class="d-flex gap-2 flex-wrap">
+              <a routerLink="/administrador/aprovar-imoveis" class="btn btn-warning">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Aprovar Imóveis
+                <span class="badge bg-dark ms-2" *ngIf="imoveisEmAnalise > 0">
+                  {{ imoveisEmAnalise }}
+                </span>
+              </a>
+              <a routerLink="/imoveis" class="btn btn-outline-primary">
+                <i class="bi bi-building me-2"></i>
+                Ver Todos os Imóveis
+              </a>
+              <a routerLink="/administrador/gestao-utilizadores" class="btn btn-outline-secondary">
+                <i class="bi bi-people me-2"></i>
+                Gerir Utilizadores
+              </a>
+              
+              <a routerLink="/administrador/relatorios" class="btn btn-outline-info">
+                <i class="bi bi-bar-chart me-2"></i>
+                Relatórios
+              </a>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações -->
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">
+              <i class="bi bi-info-circle me-2"></i>
+              Responsabilidades
+            </h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Aprovar ou recusar imóveis publicados
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Monitorar a qualidade dos anúncios
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Garantir a integridade da plataforma
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Gerir conteúdo inadequado ou fraudulento
+              </li>
+              <li>
+                <i class="bi bi-check-circle text-success me-2"></i>
+                Auxiliar utilizadores quando necessário
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-white">
+            <h5 class="mb-0">
+              <i class="bi bi-gear me-2"></i>
+              Sistema
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <h6 class="small text-muted mb-1">Versão do Sistema</h6>
+              <p class="mb-0">ArrendaJá v1.0.0</p>
+            </div>
+            <div class="mb-3">
+              <h6 class="small text-muted mb-1">Ambiente</h6>
+              <p class="mb-0">
+                <span class="badge bg-success">Desenvolvimento</span>
+              </p>
+            </div>
+            <div>
+              <h6 class="small text-muted mb-1">Status da API</h6>
+              <p class="mb-0">
+                <i class="bi bi-circle-fill text-success me-2"></i>
+                Operacional
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso -->
+    <div class="alert alert-warning mt-4">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      <strong>Atenção:</strong> Como administrador, você tem acesso a funcionalidades críticas do sistema. Use com responsabilidade.
+    </div>
+  </div>
+</div>

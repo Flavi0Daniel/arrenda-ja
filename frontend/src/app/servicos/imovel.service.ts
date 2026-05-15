@@ -49,6 +49,13 @@ export class ImovelService {
   }
 
   /**
+   * Listar todos os imóveis (admin)
+   */
+  listarTodos(): Observable<RespostaAPI<Imovel[]>> {
+    return this.http.get<RespostaAPI<Imovel[]>>(`${this.API_URL}/admin/todos`);
+  }
+
+  /**
    * Criar novo imóvel
    */
   criar(dadosImovel: Partial<Imovel>): Observable<RespostaAPI<Imovel>> {
@@ -90,10 +97,36 @@ export class ImovelService {
   }
 
   /**
+ * Alterar status (proprietário) - usa PUT em vez de PATCH
+ */
+  /**
+ * Alterar status (proprietário) - endpoint específico
+ */
+alterarStatusProprietario(id: number, status: string): Observable<RespostaAPI<any>> {
+  return this.http.patch<RespostaAPI<any>>(`${this.API_URL}/${id}/meu-status`, { status });
+}
+
+  /**
+   * Remover foto do imóvel
+   */
+  removerFoto(imovelId: number, fotoId: number): Observable<RespostaAPI<any>> {
+    return this.http.delete<RespostaAPI<any>>(`${this.API_URL}/${imovelId}/fotos/${fotoId}`);
+  }
+
+  /**
    * Obter URL completa da foto
    */
   obterUrlFoto(caminhoFoto: string): string {
-    if (!caminhoFoto) return 'assets/images/sem-imagem.jpg';
-    return `${environment.apiUrl.replace('/api', '')}/${caminhoFoto}`;
+    console.log('🔍 obterUrlFoto chamado com:', caminhoFoto);
+    
+    if (!caminhoFoto) {
+      console.log('❌ Sem caminho, retornando imagem padrão');
+      return 'https://placehold.co/400x300/e3e3e3/666?text=Sem+Imagem';
+    }
+    
+    const url = `${environment.apiUrl.replace('/api', '')}/${caminhoFoto}`;
+    console.log('✅ URL gerada:', url);
+    
+    return url;
   }
 }

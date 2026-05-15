@@ -125,4 +125,12 @@ export class AutenticacaoService {
     const utilizadorJson = localStorage.getItem(this.UTILIZADOR_KEY);
     return utilizadorJson ? JSON.parse(utilizadorJson) : null;
   }
+
+  /**
+ * Atualizar dados do utilizador no localStorage
+ */
+  atualizarUtilizadorLocal(utilizador: Utilizador): void {
+    localStorage.setItem(this.UTILIZADOR_KEY, JSON.stringify(utilizador));
+    this.utilizadorAtualSubject.next(utilizador);
+  }
 }

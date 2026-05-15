@@ -13,6 +13,9 @@ import { InicioModule } from './funcionalidades/inicio/inicio.module';
 import { ImoveisModule } from './funcionalidades/imoveis/imoveis.module';
 import { ProprietarioModule } from './funcionalidades/proprietario/proprietario.module';
 import { ArrendatarioModule } from './funcionalidades/arrendatario/arrendatario.module';
+import { AdministradorModule } from './funcionalidades/administrador/administrador.module';
+import { MensagensModule } from './funcionalidades/mensagens/mensagens.module'; 
+import { PerfilModule } from './funcionalidades/perfil/perfil.module';
 
 
 
@@ -35,7 +38,10 @@ import { erroInterceptor } from './nucleos/interceptors/erro.interceptor';
     InicioModule,
     ImoveisModule,
     ProprietarioModule,
-    ArrendatarioModule
+    ArrendatarioModule,
+    AdministradorModule,
+    MensagensModule,
+    PerfilModule
   ],
   providers: [
     provideHttpClient(
