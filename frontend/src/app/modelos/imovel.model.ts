@@ -39,7 +39,7 @@ export interface Imovel {
 export interface FotoImovel {
   id: number;
   imovelId: number;
-  caminhoArquivo: string;
+  caminho_arquivo: string;
   ePrincipal: boolean;
   ordemExibicao: number;
 }

@@ -56,6 +56,14 @@ export class EditarImovelComponent implements OnInit {
       next: (resposta) => {
         if (resposta.sucesso && resposta.dados) {
           this.imovel = resposta.dados;
+
+
+          // DEBUG - ADICIONE ESTAS LINHAS:
+          console.log('🏠 Imóvel carregado:', this.imovel);
+          console.log('📸 fotoPrincipal:', this.imovel.fotoPrincipal);
+          console.log('📸 foto_principal:', this.imovel.foto_principal);
+          console.log('📸 fotos array:', this.imovel.fotos);
+
           this.preencherFormulario();
         }
         this.carregando = false;
@@ -286,5 +294,8 @@ export class EditarImovelComponent implements OnInit {
     };
     return textos[this.imovel?.status || ''] || '';
   }
+
+
+  
 
 }

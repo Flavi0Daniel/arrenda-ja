@@ -32,7 +32,7 @@
         <div class="card mb-4 shadow-sm">
           <div class="position-relative" style="background: #000;">
             <img 
-              [src]="obterUrlFoto(imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos[fotoAtual].caminhoArquivo : '')" 
+              [src]="obterUrlFoto(imovel.fotos && imovel.fotos.length > 0 ? imovel.fotos[fotoAtual].caminho_arquivo : '')" 
               [alt]="imovel.titulo"
               class="img-fluid w-100"
               style="max-height: 500px; object-fit: contain;">
@@ -61,7 +61,7 @@
             <div class="d-flex gap-2 overflow-auto">
               <img 
                 *ngFor="let foto of imovel.fotos; let i = index"
-                [src]="obterUrlFoto(foto.caminhoArquivo)"
+                [src]="obterUrlFoto(foto.caminho_arquivo)"
                 [alt]="'Foto ' + (i + 1)"
                 class="img-thumbnail"
                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
