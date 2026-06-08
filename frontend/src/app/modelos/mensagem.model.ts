@@ -7,6 +7,14 @@ export interface Mensagem {
   conteudo: string;
   foiLida: boolean;
   dataEnvio: Date;
+
+  // Adicionar campos snake_case também:
+  remetente_id: number;      // ← ADICIONAR
+  destinatario_id: number;   // ← ADICIONAR
+  imovel_id?: number;        // ← ADICIONAR
+  foi_lida: boolean;         // ← ADICIONAR
+  data_envio: Date;          // ← ADICIONAR
+
   
   // Campos extras do JOIN
   remetenteNome?: string;
@@ -21,4 +29,5 @@ export interface EnviarMensagem {
   imovelId?: number;
   assunto?: string;
   conteudo: string;
+  
 }

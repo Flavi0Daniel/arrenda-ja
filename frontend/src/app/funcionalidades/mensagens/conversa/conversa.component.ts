@@ -14,7 +14,7 @@ export class ConversaComponent implements OnInit {
   @ViewChild('chatContainer') private chatContainer!: ElementRef;
  
   mensagens: Mensagem[] = [];
-  outroUtilizadorId!: number;
+  outroUtilizador_id!: number;
   imovelId?: number;
   carregando = false;
   enviando = false;
@@ -40,7 +40,7 @@ export class ConversaComponent implements OnInit {
  
     // Obter parâmetros da rota
     this.route.params.subscribe(params => {
-      this.outroUtilizadorId = +params['id'];
+      this.outroUtilizador_id = +params['id'];
       
       this.route.queryParams.subscribe(queryParams => {
         if (queryParams['imovelId']) {
@@ -56,7 +56,7 @@ export class ConversaComponent implements OnInit {
     this.carregando = true;
     this.erro = null;
  
-    this.mensagemService.obterConversa(this.outroUtilizadorId, this.imovelId).subscribe({
+    this.mensagemService.obterConversa(this.outroUtilizador_id, this.imovelId).subscribe({
       next: (resposta) => {
         if (resposta.sucesso && resposta.dados) {
           this.mensagens = resposta.dados;
@@ -87,7 +87,7 @@ export class ConversaComponent implements OnInit {
     this.enviando = true;
  
     const dados: EnviarMensagem = {
-      destinatarioId: this.outroUtilizadorId,
+      destinatarioId: this.outroUtilizador_id,
       conteudo: this.novaMensagem.trim()
     };
  

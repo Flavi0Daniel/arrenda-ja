@@ -79,14 +79,27 @@ export class ListaMensagensComponent implements OnInit {
   }
  
   abrirConversa(mensagem: Mensagem): void {
+    console.log('🔍 Mensagem clicada:', mensagem);
+    console.log('🔍 abaAtiva:', this.abaAtiva);
+    console.log('🔍 remetenteId:', mensagem.remetente_id);
+    console.log('🔍 destinatarioId:', mensagem.destinatario_id);
+    
     const outroUtilizadorId = this.abaAtiva === 'recebidas' 
-      ? mensagem.remetenteId 
-      : mensagem.destinatarioId;
+      ? mensagem.remetente_id 
+      : mensagem.destinatario_id;
+    
+    console.log('🔍 outroUtilizadorId calculado:', outroUtilizadorId);
+    
+    if (!outroUtilizadorId) {
+      console.error('❌ outroUtilizadorId está undefined!');
+      this.erro = 'Erro ao abrir conversa: ID do utilizador não encontrado';
+      return;
+    }
     
     this.router.navigate(['/mensagens/conversa', outroUtilizadorId], {
       queryParams: mensagem.imovelId ? { imovelId: mensagem.imovelId } : {}
     });
-  } 
+  }
  
   obterTempoDecorrido(data: Date): string {
     return this.mensagemService.obterTempoDecorrido(data);
